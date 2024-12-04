@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { images } from '../../constants'
 import FormField from '../../components/FormField'
 import CustomButton from '../../components/CustomButton'
-import { Link } from 'expo-router'
+import { Link, router } from 'expo-router'
 
 const SignIn = () => {
   const [form, setForm] = useState({
@@ -36,7 +36,7 @@ const SignIn = () => {
           />
           <CustomButton
             title={"Sign In"}
-            handlePress={() => { }}
+            handlePress={() => { router.replace("/home") }}
             containerStyles="mt-7"
             isLoading={isSubmitting}
           />

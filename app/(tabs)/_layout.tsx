@@ -1,21 +1,10 @@
-import { View, Text, Image } from 'react-native'
-import { Tabs, Redirect } from 'expo-router'
+import { Tabs } from 'expo-router'
 import { icons } from '../../constants'
 import React from 'react'
+import { TabIcon } from '@/components/TabIcon'
+import { StatusBar } from 'expo-status-bar'
 
-const TabIcon = ({ icon, color, name, focused }) => {
-  return (
-    <View className="items-center justify-center gap-2">
-      <Image
-        source={icon}
-        resizeMode='contain'
-        tintColor={color}
-        className="w-6 h-6"
-      />
-      <Text className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs`} style={{ color: color }}>{name}</Text>
-    </View>
-  )
-}
+
 
 const TabsLayout = () => {
   return (
@@ -45,20 +34,19 @@ const TabsLayout = () => {
                 name="Home"
                 focused={focused}
               />
-
             )
           }}
         />
         <Tabs.Screen
-          name='bookmark'
+          name='saved'
           options={{
-            title: 'Bookmark',
+            title: 'Saved',
             headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <TabIcon
                 icon={icons.bookmark}
                 color={color}
-                name="Bookmark"
+                name="Saved"
                 focused={focused}
               />
 
@@ -98,9 +86,10 @@ const TabsLayout = () => {
           }}
         />
       </Tabs>
+      <StatusBar backgroundColor="#161622" style="light" />
     </>
   )
 }
 
-export default TabsLayout 
+export default TabsLayout
 

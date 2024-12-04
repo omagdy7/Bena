@@ -3,8 +3,8 @@ import React from 'react'
 
 const Create = () => {
   return (
-    <View>
-      <Text>Create</Text>
+    <View className='flex-1 items-center justify-center'>
+      <Text className='text-2xl'>Create</Text>
     </View>
   )
 }

@@ -5,7 +5,6 @@ import { images } from '../constants'
 import CustomButton from '../components/CustomButton';
 import { StatusBar } from 'expo-status-bar';
 import './global.css'
-import { ImageBackground } from 'react-native';
 
 export default function App() {
   return (

@@ -1,7 +1,15 @@
 import { TouchableOpacity, View, Text } from 'react-native'
 import React from 'react'
 
-const CustomButton = ({ title, handlePress, containerStyles, textstyles, isLoading }) => {
+type CustomButtonProps = {
+  title: string,
+  handlePress: () => void
+  containerStyles?: string,
+  textstyles?: string,
+  isLoading?: boolean
+}
+
+const CustomButton = ({ title, handlePress, containerStyles, isLoading }: CustomButtonProps) => {
   return (
     <TouchableOpacity
       onPress={handlePress}
