@@ -1,14 +1,16 @@
-import { ScrollView, View, Image, Text } from 'react-native';
+import { ScrollView, View, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, router } from 'expo-router';
 import { images } from '../constants'
 import CustomButton from '../components/CustomButton';
 import { StatusBar } from 'expo-status-bar';
-import './global.css'
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 
 export default function App() {
   return (
-    <SafeAreaView className="bg-primary h-full">
+    <SafeAreaView className="h-full bg-black">
       <ScrollView contentContainerStyle={{ height: '100%' }}>
         <View className="w-full h-[85vh] justify-center items-center px-4">
           <Image
@@ -28,7 +30,6 @@ export default function App() {
             handlePress={() => router.push('/sign-in')}
             containerStyles={"w-full mt-7"}
           />
-
         </View>
       </ScrollView>
 
