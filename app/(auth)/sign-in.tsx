@@ -6,7 +6,7 @@ import FormField from '../../components/FormField'
 import CustomButton from '../../components/CustomButton'
 import { Link, router } from 'expo-router'
 import React from 'react'
-import { useAuth } from '../../components/AuthProivder'
+import { useAuth } from '@/context/AuthProvider';
 
 interface FormData {
   email: string;

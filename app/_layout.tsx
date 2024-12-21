@@ -10,7 +10,7 @@ import { NAV_THEME } from '../lib/constants';
 import { useColorScheme } from '../lib/useColorScheme';
 import { useEffect } from 'react';
 import { useFonts } from 'expo-font'
-import AuthProvider from '@/components/AuthProivder';
+import AuthProvider from '../context/AuthProvider';
 
 const LIGHT_THEME: Theme = {
   dark: false,
