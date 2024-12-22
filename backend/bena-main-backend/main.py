@@ -100,72 +100,13 @@ def insert_data_from_csv(csv_file_path: str):
                 #print(data)
 
                 #Insert into the Supabase table
-                response = supabase.table("places").insert(data).execute()
-
+                #response = supabase.table("places").insert(data).execute()
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
 
-
-    # Load the CSV file with place names
-    # input_file = "places.csv"  # Change to your file name
-    # output_file = "places_results.csv"
-
-    # # Read the CSV file into a DataFrame
-    # df = pd.read_csv(input_file)
-    #
-    # # Make sure the column with place names is correctly labeled
-    # # Replace 'Place Name' with the column name in your CSV file
-    # place_column = 'Place Name'
-    #
-    # # Initialize lists to store the results
-    # locations = []
-    # descriptions = []
-    # ratings = []
-
-    # Iterate through each place and query Google Maps
-    # for place in df[place_column]:
-
-
-                # Extract location (latitude and longitude)
-    #             location = place_info['geometry']['location']
-    #             locations.append(f"{location['lat']}, {location['lng']}")
-    #
-    #             # Extract description (if available)
-    #             descriptions.append(place_info.get('name', 'N/A'))
-    #
-    #             # Extract average rating (if available)
-    #             ratings.append(place_info.get('rating', 'N/A'))
-    #         else:
-    #             # If no results found
-    #             locations.append('N/A')
-    #             descriptions.append('N/A')
-    #             ratings.append('N/A')
-    #
-    #         # Add delay to avoid rate limits
-    #         time.sleep(0.5)
-    #     except Exception as e:
-    #         print(f"Error fetching details for {place}: {e}")
-    #         locations.append('Error')
-    #         descriptions.append('Error')
-    #         ratings.append('Error')
-    #
-    # # Add the results to the DataFrame
-    # df['Location'] = locations
-    # df['Description'] = descriptions
-    # df['Average Rating'] = ratings
-    #
-    # # Save the updated DataFrame to a new CSV file
-    # df.to_csv(output_file, index=False)
-    #
-    # print(f"Results saved to {output_file}")
-
-
-
-# Usage example
-csv_file_path = "data_sets/places_imgs.csv"
-insert_data_from_csv(csv_file_path)
-
-#print(response)
-
+# # Getting started
+# csv_file_path = "data_sets/places_imgs.csv"
+# insert_data_from_csv(csv_file_path)
+    
