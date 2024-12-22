@@ -1,12 +1,11 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 
 import os
 import csv
 from supabase import create_client, Client
-import pandas as pd
 import googlemaps
-import time
 import wikipediaapi
 
 # initialize supabase connection
@@ -23,9 +22,9 @@ gmaps = googlemaps.Client(key=api_key)
 user_agent = "Bena/1.0 (bena@example.com)"
 wiki = wikipediaapi.Wikipedia(user_agent=user_agent)
 
+
 # inserting famous places in Egypt
 def insert_data_from_csv(csv_file_path: str):
-
     # Dictionary to store unique places
     unique_places = {}
     places = []
@@ -42,11 +41,11 @@ def insert_data_from_csv(csv_file_path: str):
                     unique_places[place_landmark] = 1
                     places.append(row)
 
-            print("number of new data:",len(places))
+            print("number of new data:", len(places))
             # print(places)
             # Loop through rows in the cleaned places names data
             for row in places:
-                place_name = row["name"].replace('_',' ')
+                place_name = row["name"].replace('_', ' ')
 
                 maps_addr = "Default address"
                 maps_lat = 0.0
@@ -60,15 +59,15 @@ def insert_data_from_csv(csv_file_path: str):
                 results = gmaps.places(query=place_name)
 
                 if results['status'] == 'OK' and results['results']:
-                    #print(results)
+                    # print(results)
                     place_info = results['results'][0]
-                    #print(place_info)
+                    # print(place_info)
                     maps_addr = place_info["formatted_address"]
                     maps_lat = place_info["geometry"]["location"]["lat"]
                     maps_long = place_info["geometry"]["location"]["lng"]
                     maps_type = place_info["types"][0]
-                    maps_link = "https://www.google.com/maps/place/?q=place_id:"+place_info["place_id"]
-                    #print(maps_lat)
+                    maps_link = "https://www.google.com/maps/place/?q=place_id:" + place_info["place_id"]
+                    # print(maps_lat)
 
                 # Get the page for the place
                 page = wiki.page(place_name)
@@ -84,8 +83,8 @@ def insert_data_from_csv(csv_file_path: str):
 
                 # Map CSV columns to database columns
                 data = {
-                    "name": place_name ,
-                    "image": row["url"], # from main dataset
+                    "name": place_name,
+                    "image": row["url"],  # from main dataset
                     "description": quick_desc,  # Assign default values
                     "address": maps_addr,
                     "location": "Default location",
@@ -93,20 +92,18 @@ def insert_data_from_csv(csv_file_path: str):
                     "rating": 0.0,
                     "latitude": maps_lat,
                     "longitude": maps_long,
-                    "external_link":maps_link,
-                    "arabic_name":ar_title
+                    "external_link": maps_link,
+                    "arabic_name": ar_title
 
                 }
-                #print(data)
+                print(data)
 
-                #Insert into the Supabase table
-                #response = supabase.table("places").insert(data).execute()
+                # Insert into the Supabase table
+                response = supabase.table("places").insert(data).execute()
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
-
 # # Getting started
 # csv_file_path = "data_sets/places_imgs.csv"
 # insert_data_from_csv(csv_file_path)
-    
