@@ -1,0 +1,1 @@
+# Create Trips suggestion, recommendations model and auto created Trips
