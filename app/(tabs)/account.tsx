@@ -1,20 +1,21 @@
-
-
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { useAuth } from '@/context/AuthProvider';
 import { useProfile } from '@/hooks/useProfile'; // Assuming the custom hook
+import { icons } from '@/constants';
 
-export default function Profile() {
+export default function Account() {
   const { user, signOut } = useAuth();
   const { profile, loading, error } = useProfile(user?.id || null);
+  console.log(profile)
 
   const menuItems = [
-    { id: '1', title: 'History', icon: '🎟️', onPress: () => { } },
-    { id: '2', title: 'Profile', icon: '👤', onPress: () => { } },
-    { id: '3', title: 'Messages', icon: '📩', onPress: () => { } },
-    { id: '4', title: 'Preferences', icon: '⚙️', onPress: () => { } },
+    { id: '1', title: 'History', icon: icons.history, onPress: () => { } },
+    { id: '2', title: 'Profile', icon: icons.user, onPress: () => { } },
+    { id: '3', title: 'Group', icon: icons.group, onPress: () => { } },
+    { id: '4', title: 'settings', icon: icons.settings, onPress: () => { } },
   ];
 
 
@@ -60,7 +61,11 @@ export default function Profile() {
             onPress={item.onPress}
           >
             <View className="flex-row items-center">
-              <Text className="text-white text-xl mr-4">{item.icon}</Text>
+              <Image
+                source={item.icon}
+                resizeMode='contain'
+                className="w-6 h-6 mx-2"
+              />
               <Text className="text-white text-lg">{item.title}</Text>
             </View>
             <Text className="text-gray-500 text-lg">{'>'}</Text>
@@ -71,7 +76,7 @@ export default function Profile() {
         variant={"destructive"}
         onPress={signOut}
       >
-        <Text className='text-white'>
+        <Text className='font-psemibold text-white text-base'>
           Sign Out
         </Text>
       </Button>

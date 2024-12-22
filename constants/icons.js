@@ -11,6 +11,10 @@ const logout = require("../assets/icons/logout.png");
 const eyeHide = require("../assets/icons/eye-hide.png");
 const eye = require("../assets/icons/eye.png");
 const play = require("../assets/icons/play.png");
+const history = require("../assets/icons/history.png");
+const user = require("../assets/icons/user.png");
+const settings = require("../assets/icons/settings.png");
+const group = require("../assets/icons/group.png");
 
 export default {
   play,
@@ -26,4 +30,8 @@ export default {
   logout,
   eyeHide,
   eye,
+  history,
+  user,
+  settings,
+  group
 };
