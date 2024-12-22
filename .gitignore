@@ -44,8 +44,5 @@ app-example
 *.idea/
 *.venv/
 
-# datasets
-data_sets/
-
 # APIs
 *.env
