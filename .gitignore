@@ -39,3 +39,13 @@ app-example
 
 /android
 /ios
+
+# pycharm
+*.idea/
+*.venv/
+
+# datasets
+data_sets/
+
+# APIs
+*.env
