@@ -1,21 +1,32 @@
-import { View, TouchableOpacity, FlatList, Image } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, TouchableOpacity, FlatList, Image, Animated } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/context/AuthProvider';
-import { useProfile } from '@/hooks/useProfile'; // Assuming the custom hook
+import { useProfile } from '@/hooks/useProfile';
 import { icons } from '@/constants';
+import { router } from 'expo-router';
 
 export default function Account() {
   const { user, signOut } = useAuth();
   const { profile, loading, error } = useProfile(user?.id || null);
-  console.log(profile)
+  const fadeAnim = new Animated.Value(0);
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const menuItems = [
     { id: '1', title: 'History', icon: icons.history, onPress: () => { } },
     { id: '2', title: 'Profile', icon: icons.user, onPress: () => { } },
     { id: '3', title: 'Group', icon: icons.group, onPress: () => { } },
-    { id: '4', title: 'settings', icon: icons.settings, onPress: () => { } },
+    { id: '4', title: 'settings', icon: icons.settings, onPress: () => { router.push('/settings') } },
   ];
 
 
@@ -36,50 +47,66 @@ export default function Account() {
   }
 
   return (
-    <View className="flex-1 bg-black px-6 py-4">
-      {/* Header */}
-      <View className="flex-row items-center justify-between">
-        <Text className="text-white text-3xl font-bold">Account</Text>
-        <Avatar alt="Corresponds to avatar picture">
-          {profile?.avatar_url ? (
-            <AvatarImage source={{ uri: profile.avatar_url }} />
-          ) : (
-            <AvatarFallback>
-              <Text className="text-lg text-white">{profile?.username?.charAt(0) || 'U'}</Text>
-            </AvatarFallback>
-          )}
-        </Avatar>
-      </View>
+    <LinearGradient
+      colors={['#1a202c', '#2d3748']}
+      className="flex-1 mb-32 mt-8"
+    >
+      <Animated.View className="flex-1 bg-black px-6 py-4">
+        {/* Header */}
+        <View className="flex-row items-center justify-between mb-8">
+          <Text className="text-white text-3xl font-bold">Account</Text>
+          <Avatar alt="Corresponds to avatar picture " className="w-16 h-16 border-2 border-purple-500">
+            {profile?.avatar_url ? (
+              <AvatarImage source={{ uri: profile.avatar_url }} />
+            ) : (
+              <AvatarFallback>
+                <Text className="text-2xl text-white">{profile?.username?.charAt(0) || 'U'}</Text>
+              </AvatarFallback>
+            )}
+          </Avatar>
+        </View>
 
-      {/* Menu List */}
-      <FlatList
-        data={menuItems}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            className="flex-row items-center justify-between border-b border-gray-700 py-4"
-            onPress={item.onPress}
+        {/* User Info */}
+        <View className="mb-8">
+          <Text className="text-white text-2xl font-semibold">{profile?.username || 'User'}</Text>
+          <Text className="text-gray-400 text-base">{profile?.email || 'email@example.com'}</Text>
+        </View>
+
+        {/* Menu List */}
+        <FlatList
+          data={menuItems}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              className="flex-row items-center justify-between bg-gray-800 rounded-lg mb-4 p-4"
+              onPress={item.onPress}
+            >
+              <View className="flex-row items-center">
+                <View className="bg-emerald-700 rounded-full p-2 mr-4">
+                  <Image
+                    source={item.icon}
+                    resizeMode='contain'
+                    className="w-6 h-6"
+                  />
+                </View>
+                <Text className="text-white text-lg">{item.title}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+
+        <View className="mt-auto">
+          <Button
+            variant="destructive"
+            onPress={signOut}
+            className="bg-red-500 py-4 rounded-lg"
           >
-            <View className="flex-row items-center">
-              <Image
-                source={item.icon}
-                resizeMode='contain'
-                className="w-6 h-6 mx-2"
-              />
-              <Text className="text-white text-lg">{item.title}</Text>
-            </View>
-            <Text className="text-gray-500 text-lg">{'>'}</Text>
-          </TouchableOpacity>
-        )}
-      />
-      <Button
-        variant={"destructive"}
-        onPress={signOut}
-      >
-        <Text className='font-psemibold text-white text-base'>
-          Sign Out
-        </Text>
-      </Button>
-    </View>
+            <Text className="font-semibold text-white text-base">
+              Sign Out
+            </Text>
+          </Button>
+        </View>
+      </Animated.View>
+    </LinearGradient>
   );
 }

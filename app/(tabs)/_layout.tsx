@@ -3,28 +3,34 @@ import { icons } from '../../constants'
 import React from 'react'
 import { TabIcon } from '@/components/TabIcon'
 import { StatusBar } from 'expo-status-bar'
+import { BlurView } from 'expo-blur'
+import { View } from 'react-native'
 
 const tabScreens = [
   { name: 'home', title: 'Home', icon: icons.home },
   { name: 'bookmark', title: 'Bookmark', icon: icons.bookmark },
   { name: 'create', title: 'Create', icon: icons.plus },
   { name: 'account', title: 'Account', icon: icons.profile },
-  // { name: 'home/[id]', title: 'PlaceDetails', icon: icons.profile },
 ]
 
 const TabsLayout = () => {
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
           tabBarActiveTintColor: '#fcbf49',
           tabBarInactiveTintColor: '#CDCDE0',
           tabBarStyle: {
-            backgroundColor: '#161622',
-            borderTopWidth: 1,
-            borderTopColor: '#232533',
-            height: 64,
+            position: 'absolute',
+            bottom: 20,
+            left: 20,
+            right: 20,
+            elevation: 0,
+            backgroundColor: 'transparent',
+            borderTopWidth: 0,
+            height: 60,
+            zIndex: 1,
           },
         }}
       >
@@ -46,18 +52,28 @@ const TabsLayout = () => {
             }}
           />
         ))}
-        <Tabs.Screen
-          name="home/[id]"
-          options={{
-            headerShown: false, // Hide the header for the dynamic route
-            tabBarButton: () => null, // Prevent the tab from showing
-          }}
-        />
       </Tabs>
+      <BlurView
+        intensity={80}
+        tint="light"
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          left: 20,
+          right: 20,
+          height: 75,
+          borderRadius: 15,
+          overflow: 'hidden',
+          zIndex: 0,
+        }}
+      >
+        <View style={{ flex: 1, backgroundColor: 'rgba(12, 12, 24, 0.85)' }} />
+      </BlurView>
       <StatusBar backgroundColor="#161622" style="light" />
-    </>
+    </View>
   )
 }
 
 export default TabsLayout
+
 
