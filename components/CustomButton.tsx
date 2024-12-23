@@ -1,23 +1,38 @@
-import { TouchableOpacity, View, Text } from 'react-native'
 import React from 'react'
+import { TouchableOpacity, Text, ActivityIndicator } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 
-type CustomButtonProps = {
-  title: string,
+interface CustomButtonProps {
+  title: string
   handlePress: () => void
-  containerStyles?: string,
-  textstyles?: string,
   isLoading?: boolean
+  icon?: string
 }
 
-const CustomButton = ({ title, handlePress, containerStyles, isLoading }: CustomButtonProps) => {
+const CustomButton: React.FC<CustomButtonProps> = ({
+  title,
+  handlePress,
+  isLoading = false,
+  icon,
+}) => {
   return (
     <TouchableOpacity
+      className="bg-secondary py-4 rounded-full items-center justify-center flex-row"
       onPress={handlePress}
-      activeOpacity={0.7}
-      className={`bg-amber-500 rounded-2xl min-h-[62px] justify-center items-center ${containerStyles} ${isLoading ? 'opacity-50' : ''}`} >
-      <Text className="font-psemibold text-lg">{title}</Text>
-    </TouchableOpacity >
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <ActivityIndicator color="#fff" />
+      ) : (
+        <>
+          <Text className="text-zinc-900 font-bold text-lg mr-2">{title}</Text>
+          {icon && <Ionicons name={icon} size={24} color="#18181b" />}
+        </>
+      )}
+    </TouchableOpacity>
   )
 }
 
 export default CustomButton
+
+

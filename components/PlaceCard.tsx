@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Pressable } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import {
   Card,
   CardContent,
@@ -17,20 +17,25 @@ interface PlaceCardProps {
 export const PlaceCard: React.FC<PlaceCardProps> = ({ place, onPress }) => {
   return (
     <Pressable onPress={() => onPress?.(place)}>
-      <Card className="dark w-full max-w-sm mb-4">
+      <Card className="dark w-full overflow-hidden rounded-2xl">
         <Image
           source={{ uri: place.image }}
-          className="w-full h-40 rounded-t-lg"
+          className="w-full h-48 rounded-t-lg"
           resizeMode="cover"
         />
-        <CardHeader>
-          <CardTitle>{place.name}</CardTitle>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">{place.name}</CardTitle>
         </CardHeader>
-        <CardContent className="flex-row justify-between items-center pb-2">
-          <Text className="text-sm text-gray-500">{place.category}</Text>
-          <Text className="text-sm">⭐ {place.rating.toFixed(1)}</Text>
+        <CardContent className="flex-row justify-between items-center pb-3">
+          <Text className="text-sm text-gray-400">
+            {place.location}
+          </Text>
+          <View className="flex-row items-center">
+            <Text className="text-sm text-yellow-400">{place.rating.toFixed(1)}</Text>
+          </View>
         </CardContent>
       </Card>
     </Pressable>
   );
 };
+
