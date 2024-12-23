@@ -15,6 +15,7 @@ const history = require("../assets/icons/history.png");
 const user = require("../assets/icons/user.png");
 const settings = require("../assets/icons/settings.png");
 const group = require("../assets/icons/group.png");
+const map_pin = require("../assets/icons/map-pin.png");
 
 export default {
   play,
@@ -33,5 +34,6 @@ export default {
   history,
   user,
   settings,
-  group
+  group,
+  map_pin,
 };
