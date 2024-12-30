@@ -28,15 +28,19 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Build Android
+      # Step 4: Install Expo CLI
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
+      # Step 5: Build Android
       - name: Build Android
         run: expo build:android --non-interactive
 
-      # Step 5: Build iOS
+      # Step 6: Build iOS
       - name: Build iOS
         run: expo build:ios --non-interactive
 
-      # Step 6: Verify builds
+      # Step 7: Verify builds
       - name: Verify builds
         run: |
           echo "Builds completed successfully!"
