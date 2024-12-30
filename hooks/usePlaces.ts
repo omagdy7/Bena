@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Place } from '@/db/schema';
 
@@ -8,58 +8,50 @@ interface CategoryGroup {
   count: number;
 }
 
-interface UsePlacesReturn {
-  categorizedPlaces: [string, Place[]][];
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
-}
+const fetchPlaces = async (): Promise<[string, Place[]][]> => {
+  // Get categories and their counts
+  const { data: categoryData, error: categoryError } = await supabase
+    .from('category_counts') // Query the view
+    .select('category, count')
+    .order('count', { ascending: false });
 
-export const usePlaces = (): UsePlacesReturn => {
-  const [categorizedPlaces, setCategorizedPlaces] = useState<[string, Place[]][]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  if (categoryError) throw new Error(categoryError.message);
 
-  const fetchPlaces = async (): Promise<void> => {
-    try {
-      setLoading(true);
+  // Fetch places for each category in parallel
+  const categoriesWithPlaces = await Promise.all(
+    categoryData.map(async ({ category }) => {
+      const { data: places, error: placesError } = await supabase
+        .from('places')
+        .select('places_id, name, category, image')
+        .eq('category', category)
+        .order('created_at', { ascending: false });
 
-      // First, get categories and their counts using the view
-      const { data: categoryData, error: categoryError } = await supabase
-        .from('category_counts')  // Query the view
-        .select('category, count')
-        .order('count', { ascending: false });
+      if (placesError) throw new Error(placesError.message);
 
-      if (categoryError) throw categoryError;
+      return [category || 'Other', places] as [string, Place[]];
+    })
+  );
 
-      // Then fetch places for each category in parallel
-      const categoriesWithPlaces = await Promise.all(
-        categoryData.map(async ({ category }) => {
-          const { data: places, error: placesError } = await supabase
-            .from('places')
-            .select('*')
-            .eq('category', category)
-            .order('created_at', { ascending: false });
+  return categoriesWithPlaces;
+};
 
-          if (placesError) throw placesError;
+export const usePlaces = () => {
+  const {
+    data: categorizedPlaces = [],
+    isLoading: loading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['places'], // The unique key for caching and identification
+    queryFn: fetchPlaces, // The function to fetch data
+    staleTime: Infinity, // Never refetch automatically
+  });
 
-          return [category || 'Other', places] as [string, Place[]];
-        })
-      );
-
-      setCategorizedPlaces(categoriesWithPlaces);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'An error occurred while fetching places'
-      );
-    } finally {
-      setLoading(false);
-    }
+  return {
+    categorizedPlaces,
+    loading,
+    error: isError ? (error as Error).message : null,
+    refetch,
   };
-
-  useEffect(() => {
-    fetchPlaces();
-  }, []);
-
-  return { categorizedPlaces, loading, error, refetch: fetchPlaces };
 };
