@@ -1,12 +1,12 @@
-import React from 'react'
-import { TouchableOpacity, Text, ActivityIndicator } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import React from "react";
+import { TouchableOpacity, Text, ActivityIndicator } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface CustomButtonProps {
-  title: string
-  handlePress: () => void
-  isLoading?: boolean
-  icon?: string
+  title: string;
+  handlePress: () => void;
+  isLoading?: boolean;
+  icon: typeof Ionicons;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -30,9 +30,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         </>
       )}
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default CustomButton
-
-
+export default CustomButton;
