@@ -122,6 +122,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="settings" options={{ headerShown: false }} />
             <Stack.Screen name="home/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="trips/[id]" options={{ headerShown: false }} />
           </Stack>
         </AuthProvider>
       </ThemeProvider>
