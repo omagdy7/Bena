@@ -26,7 +26,7 @@ const TabsLayout = () => {
             bottom: 20,
             left: 20,
             right: 20,
-            elevation: 0,
+            elevation: 50,
             backgroundColor: 'transparent',
             borderTopWidth: 0,
             height: 60,
@@ -67,7 +67,7 @@ const TabsLayout = () => {
           zIndex: 0,
         }}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(12, 12, 24, 0.85)' }} />
+        <View style={{ flex: 1, backgroundColor: 'rgba(12, 12, 12, 0.90)' }} />
       </BlurView>
       <StatusBar backgroundColor="#161622" style="light" />
     </View>
