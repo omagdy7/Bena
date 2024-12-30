@@ -1,29 +1,56 @@
-import React from 'react'
-import { Text, Image, View, ImageSourcePropType } from 'react-native'
-import { MotiView } from 'moti'
+import React, { useEffect, useRef } from 'react';
+import { Text, Image, View, ImageSourcePropType, Animated } from 'react-native';
 
 type TabIconProps = {
-  icon: ImageSourcePropType | undefined
-  color: string
-  name: string
-  focused: boolean
-}
+  icon: ImageSourcePropType | undefined;
+  color: string;
+  name: string;
+  focused: boolean;
+};
 
 export const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const opacityAnim = useRef(new Animated.Value(0.5)).current;
+  const textOpacityAnim = useRef(new Animated.Value(0)).current;
+  const textTranslateYAnim = useRef(new Animated.Value(10)).current;
+
+  useEffect(() => {
+    Animated.timing(scaleAnim, {
+      toValue: focused ? 1.2 : 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+
+    Animated.timing(opacityAnim, {
+      toValue: focused ? 1 : 0.5,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+
+    if (focused) {
+      Animated.timing(textOpacityAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+
+      Animated.timing(textTranslateYAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      textOpacityAnim.setValue(0);
+      textTranslateYAnim.setValue(10);
+    }
+  }, [focused]);
+
   return (
     <View className="flex items-center justify-center w-16 h-16">
-      <MotiView
-        from={{
-          scale: 1,
-          opacity: 0.5,
-        }}
-        animate={{
-          scale: focused ? 1.2 : 1,
-          opacity: focused ? 1 : 0.5,
-        }}
-        transition={{
-          type: 'timing',
-          duration: 300,
+      <Animated.View
+        style={{
+          transform: [{ scale: scaleAnim }],
+          opacity: opacityAnim,
         }}
       >
         <Image
@@ -32,20 +59,12 @@ export const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
           tintColor={color}
           className="w-6 h-6"
         />
-      </MotiView>
+      </Animated.View>
       {focused && (
-        <MotiView
-          from={{
-            opacity: 0,
-            translateY: 10,
-          }}
-          animate={{
-            opacity: 1,
-            translateY: 0,
-          }}
-          transition={{
-            type: 'timing',
-            duration: 300,
+        <Animated.View
+          style={{
+            opacity: textOpacityAnim,
+            transform: [{ translateY: textTranslateYAnim }],
           }}
         >
           <Text
@@ -54,8 +73,8 @@ export const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
           >
             {name}
           </Text>
-        </MotiView>
+        </Animated.View>
       )}
     </View>
-  )
-}
+  );
+};
