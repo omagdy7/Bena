@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Place } from '@/types/place';
+import { Place } from '@/db/schema';
 
 interface CategoryGroup {
   category: string;

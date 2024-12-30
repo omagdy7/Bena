@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { View, ScrollView, Image, Text, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import { supabase } from '@/lib/supabase';
-import { Place } from '@/types/place';
+import { Place } from '@/db/schema';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';

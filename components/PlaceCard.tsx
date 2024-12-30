@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
-import { Place } from '@/types/place';
+import { Place } from '@/db/schema';
 
 interface PlaceCardProps {
   place: Place;

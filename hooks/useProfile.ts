@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchAll } from '@/db/db';
+import { Profiles } from '@/db/schema'
 
 interface ProfileData {
   id: string;

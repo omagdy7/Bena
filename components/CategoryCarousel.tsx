@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { Text } from '@/components/ui/text';
-import { Place } from '@/types/place';
+import { Place } from '@/db/schema';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
