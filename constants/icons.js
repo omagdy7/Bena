@@ -16,6 +16,8 @@ const user = require("../assets/icons/user.png");
 const settings = require("../assets/icons/settings.png");
 const group = require("../assets/icons/group.png");
 const map_pin = require("../assets/icons/map-pin.png");
+const map_pinned = require("../assets/icons/map-pinned.png");
+const bike = require("../assets/icons/bike.png");
 
 export default {
   play,
@@ -36,4 +38,6 @@ export default {
   settings,
   group,
   map_pin,
+  map_pinned,
+  bike,
 };
