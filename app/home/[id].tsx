@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { View, ScrollView, Image, Text, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { Place } from '@/db/schema';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import FastImage from 'react-native-fast-image';
 
 const { width } = Dimensions.get('window');
 
@@ -59,7 +60,7 @@ const PlaceDetails: React.FC = () => {
   return (
     <ScrollView className="flex-1 bg-zinc-900">
       <View className="relative">
-        <Image
+        <FastImage
           source={{ uri: place?.image }}
           style={{ width, height: width * 0.8 }}
           resizeMode="cover"

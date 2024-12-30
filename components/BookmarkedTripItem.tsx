@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
+import { View, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import FastImage from 'react-native-fast-image';
 
 interface BookmarkedTripItemProps {
   item: {
@@ -15,16 +16,18 @@ interface BookmarkedTripItemProps {
   onRemoveBookmark: (id: string) => void;
 }
 
+const { width, height } = Dimensions.get('window');
+
 const BookmarkedTripItem: React.FC<BookmarkedTripItemProps> = ({ item, index, onRemoveBookmark }) => {
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 100).duration(400)}
       className="bg-zinc-800 rounded-xl overflow-hidden mb-4"
     >
-      <Image
+      <FastImage
         source={{ uri: item.image }}
-        className="w-full h-40"
-        resizeMode="cover"
+        style={{ width: width, height: 0.2 * height }}
+        resizeMode={FastImage.resizeMode.cover}
         accessibilityLabel={`Image of ${item.name}`}
       />
       <View className="p-4">
