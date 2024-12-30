@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { View, ScrollView, Image, Text, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { Place } from '@/db/schema';
@@ -11,6 +11,7 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 const { width } = Dimensions.get('window');
 
 const PlaceDetails: React.FC = () => {
+  const navigation = useNavigation()
   const { id } = useLocalSearchParams();
   const [place, setPlace] = useState<Place | null>(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +70,7 @@ const PlaceDetails: React.FC = () => {
         />
         <BlurView intensity={20} style={{ position: 'absolute', top: 40, left: 20, right: 20, borderRadius: 20, overflow: 'hidden' }}>
           <View className="flex-row justify-between items-center p-2">
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity>
