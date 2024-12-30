@@ -30,5 +30,27 @@ interface SavedPlaces {
   user_id: string;
   created_at: Date;
 }
+interface Trips {
+  trip_id: string; // PK
+  user_id: string; // FK to profiles.id
+  title: string;
+  description: string;
+  start_date: Date;
+  end_date: Date;
+  created_at: Date;
+  updated_at: Date;
+  status: 'planned' | 'in_progress' | 'completed';
+  steps: TripStep[]; // Array of steps (places to visit)
+}
 
-export { Place, Profiles, SavedPlaces }
+interface TripStep {
+  step_id: string;  // PK
+  trip_id: string;  // FK to trips.trip_id
+  place_id: string; // FK to places.place_id
+  step_num: number; // To maintain the sequence of steps
+  start_time: Date;
+  end_time: Date;
+  status: 'pending' | 'in_progress' | 'visited' | 'skipped';
+}
+
+export { Place, Profiles, SavedPlaces, Trips, TripStep }
