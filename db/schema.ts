@@ -30,6 +30,7 @@ interface SavedPlaces {
   user_id: string;
   created_at: Date;
 }
+
 interface Trips {
   trip_id: string; // PK
   user_id: string; // FK to profiles.id
