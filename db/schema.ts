@@ -17,15 +17,15 @@ interface Place {
   maps_id: string;
 }
 
-interface Profiles {
-  id: string;
+interface Users {
+  user_id: string;
   updated_at: Date;
   username: string;
   avatar_url: string;
 }
 
-interface SavedPlaces {
-  saved_place_id: string;
+interface Bookmarks {
+  bookmark_id: string;
   place_id: string;
   user_id: string;
   created_at: Date;
@@ -54,4 +54,4 @@ interface TripStep {
   status: 'pending' | 'in_progress' | 'visited' | 'skipped';
 }
 
-export { Place, Profiles, SavedPlaces, Trips, TripStep }
+export { Place, Users, Bookmarks, Trips, TripStep }

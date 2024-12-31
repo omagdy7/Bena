@@ -1,19 +1,18 @@
-import { fetchAll } from '@/db/db';
-import { Profiles } from '@/db/schema'
+import { Users } from '@/db/schema'
+import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 
 
 interface UseProfileResult {
-  profile: Profiles | null;
+  profile: Users | null;
   loading: boolean;
   error: string | null;
 }
 
-const fetchProfile = async (userId: string | null): Promise<Profiles | null> => {
+const fetchUser = async (userId: string | null): Promise<Users | null> => {
   if (!userId) return null;
-
-  const profiles = await fetchAll('profiles');
-  return profiles.find((p) => p.id === userId) || null;
+  const { data } = await supabase.from('users').select('*').eq('id', userId).single();
+  return data
 };
 
 
@@ -22,15 +21,15 @@ const fetchProfile = async (userId: string | null): Promise<Profiles | null> => 
  * Custom hook to fetch the user profile data
  * @param userId - The ID of the user whose profile is to be fetched.
  */
-export function useProfile(userId: string | null): UseProfileResult {
+export function useUser(userId: string | null): UseProfileResult {
   const {
     data: profile = null,
     isLoading: loading,
     isError,
     error,
   } = useQuery({
-    queryKey: ['profile', userId],
-    queryFn: () => fetchProfile(userId),
+    queryKey: ['user', userId],
+    queryFn: () => fetchUser(userId),
     enabled: !!userId, // Only run the query if userId is provided
     staleTime: Infinity, // Prevent automatic refetching
   });
