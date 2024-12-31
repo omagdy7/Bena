@@ -1,18 +1,18 @@
 import { Tabs } from 'expo-router';
-import { icons } from '../../constants';
 import React, { useState, useCallback } from 'react';
 import { TabIcon } from '@/components/TabIcon';
 import { StatusBar } from 'expo-status-bar';
 import { BlurView } from 'expo-blur';
 import { View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { Home, Bookmark, PlusIcon, Bike, CircleUser } from 'lucide-react-native';
 
 const tabScreens = [
-  { name: 'home', title: 'Home', icon: icons.home },
-  { name: 'bookmark', title: 'Bookmark', icon: icons.bookmark },
-  { name: 'create', title: 'Create', icon: icons.plus },
-  { name: 'trip', title: 'Trip', icon: icons.bike },
-  { name: 'account', title: 'Account', icon: icons.profile },
+  { name: 'home', title: 'Home', icon: Home },
+  { name: 'bookmark', title: 'Bookmark', icon: Bookmark },
+  { name: 'create', title: 'Create', icon: PlusIcon },
+  { name: 'trip', title: 'Trip', icon: Bike },
+  { name: 'account', title: 'Account', icon: CircleUser },
 ];
 
 const TabsLayout = () => {
@@ -27,7 +27,7 @@ const TabsLayout = () => {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className='flex-1'>
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
