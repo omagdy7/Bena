@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { View, TouchableOpacity, FlatList, Image, Animated } from 'react-native';
+import { View, TouchableOpacity, FlatList, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/context/AuthProvider';
-import { useProfile } from '@/hooks/useProfile';
-import { icons } from '@/constants';
+import { useUser } from '@/hooks/useUser';
+import { History, UserPen, Users, Settings } from 'lucide-react-native';
 import { router } from 'expo-router';
 import LoadingUI from '@/components/LoadingUI';
 import { useAuthCheck } from '@/hooks/useAuthCheck';
@@ -14,7 +14,7 @@ import { useAuthCheck } from '@/hooks/useAuthCheck';
 export default function Account() {
   const user = useAuthCheck();
   const { signOut } = useAuth();
-  const { profile, loading, error } = useProfile(user?.id || null);
+  const { profile, loading, error } = useUser(user?.id || null);
   const fadeAnim = new Animated.Value(0);
 
   useEffect(() => {
@@ -26,10 +26,10 @@ export default function Account() {
   }, []);
 
   const menuItems = [
-    { id: '1', title: 'History', icon: icons.history, onPress: () => { } },
-    { id: '2', title: 'Profile', icon: icons.user, onPress: () => { } },
-    { id: '3', title: 'Group', icon: icons.group, onPress: () => { } },
-    { id: '4', title: 'settings', icon: icons.settings, onPress: () => { router.push('/settings') } },
+    { id: '1', title: 'History', icon: History, onPress: () => { router.push('/history') } },
+    { id: '2', title: 'Profile', icon: UserPen, onPress: () => { router.push('/profile') } },
+    { id: '3', title: 'Group', icon: Users, onPress: () => { router.push('/group') } },
+    { id: '4', title: 'settings', icon: Settings, onPress: () => { router.push('/settings') } },
   ];
 
 
@@ -70,7 +70,7 @@ export default function Account() {
         {/* User Info */}
         <View className="mb-8">
           <Text className="text-white text-2xl font-semibold">{profile?.username || 'User'}</Text>
-          <Text className="text-gray-400 text-base">{profile?.email || 'email@example.com'}</Text>
+          <Text className="text-gray-400 text-base">{user?.email || 'email@example.com'}</Text>
         </View>
 
         {/* Menu List */}
@@ -79,16 +79,12 @@ export default function Account() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity
-              className="flex-row items-center justify-between bg-gray-800 rounded-lg mb-4 p-4"
+              className="flex-row items-center justify-between bg-zinc-800 rounded-lg mb-4 p-4"
               onPress={item.onPress}
             >
               <View className="flex-row items-center">
-                <View className="bg-emerald-700 rounded-full p-2 mr-4">
-                  <Image
-                    source={item.icon}
-                    resizeMode='contain'
-                    className="w-6 h-6"
-                  />
+                <View className="bg-secondary rounded-full p-2 mr-4">
+                  <item.icon />
                 </View>
                 <Text className="text-white text-lg">{item.title}</Text>
               </View>
