@@ -8,9 +8,12 @@ import { useAuth } from '@/context/AuthProvider';
 import { useProfile } from '@/hooks/useProfile';
 import { icons } from '@/constants';
 import { router } from 'expo-router';
+import LoadingUI from '@/components/LoadingUI';
+import { useAuthCheck } from '@/hooks/useAuthCheck';
 
 export default function Account() {
-  const { user, signOut } = useAuth();
+  const user = useAuthCheck();
+  const { signOut } = useAuth();
   const { profile, loading, error } = useProfile(user?.id || null);
   const fadeAnim = new Animated.Value(0);
 
@@ -32,9 +35,7 @@ export default function Account() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-xl text-gray-500">Loading...</Text>
-      </View>
+      <LoadingUI />
     );
   }
 

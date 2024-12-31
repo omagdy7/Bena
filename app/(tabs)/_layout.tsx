@@ -11,8 +11,8 @@ const tabScreens = [
   { name: 'home', title: 'Home', icon: icons.home },
   { name: 'bookmark', title: 'Bookmark', icon: icons.bookmark },
   { name: 'create', title: 'Create', icon: icons.plus },
-  { name: 'account', title: 'Account', icon: icons.profile },
   { name: 'trip', title: 'Trip', icon: icons.bike },
+  { name: 'account', title: 'Account', icon: icons.profile },
 ];
 
 const TabsLayout = () => {
@@ -52,7 +52,7 @@ const TabsLayout = () => {
             name={name}
             listeners={{
               focus: () => {
-                // Hide the BlurView when the 'trip' tab is focused
+                // Hide the BlurView when the 'trip' or 'create' tab is focused
                 if (hideScreens.includes(name)) {
                   setHideBlurView(true);
                 } else {

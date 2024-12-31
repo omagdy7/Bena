@@ -117,7 +117,7 @@ const HomeContent: React.FC = () => {
                   entering={FadeInDown.delay(400).springify()}
                   className="text-gray-300 text-xl mt-2"
                 >
-                  Explore amazing destinations around the world
+                  Explore amazing destinations around rich cultre of Egypt
                 </Animated.Text>
                 <Animated.View
                   entering={FadeInDown.delay(500).springify()}
