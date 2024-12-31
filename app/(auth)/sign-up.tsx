@@ -8,6 +8,7 @@ import { Link, router } from 'expo-router'
 import { useAuth } from '@/context/AuthProvider'
 import { Ionicons } from '@expo/vector-icons'
 import Toast from 'react-native-toast-message'
+import { supabase } from '@/lib/supabase'
 
 interface FormData {
   username: string
@@ -54,24 +55,38 @@ const SignUp = () => {
   }
 
   const handleSignUp = async () => {
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
+      // Step 1: Sign up the user using Supabase Auth
       const { user } = await signUp({
         email: form.email.trim(),
         password: form.password,
-      })
+      });
 
       if (user) {
+        // Step 2: Insert the username into the `users` table
+        const { error: dbError } = await supabase
+          .from('users')
+          .update([{ username: form.username.trim() }])
+          .eq('id', user.id);
+
+        if (dbError) {
+          console.log(dbError)
+          throw dbError;
+        }
+
+        // Step 3: Show success message and navigate to the home screen
         Toast.show({
           type: 'success',
-          text1: "Success",
-          text2: 'Account created successfully'
+          text1: 'Success',
+          text2: 'Account created successfully',
         });
-        router.replace('/home')
+        router.replace('/home');
       }
     } catch (error) {
+      console.log(error)
       Toast.show({
         type: 'error',
         text1: 'Sign Up Failed',
@@ -81,9 +96,9 @@ const SignUp = () => {
             : 'An error occurred during sign up. Please try again.',
       });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-900">

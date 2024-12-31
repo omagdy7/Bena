@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, Image, Alert, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { images } from '@/constants'
 import FormField from '@/components/FormField'
