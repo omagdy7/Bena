@@ -3,10 +3,10 @@ name: Expo Build Check
 on:
   push:
     branches:
-      - master
+      - nonexistant
   pull_request:
     branches:
-      - master
+      - nonexistant
 
 jobs:
   build:
