@@ -1,14 +1,15 @@
+import { LucideIcon } from 'lucide-react-native';
 import React, { useEffect, useRef } from 'react';
-import { Text, Image, View, ImageSourcePropType, Animated } from 'react-native';
+import { Text, View, Animated } from 'react-native';
 
 type TabIconProps = {
-  icon: ImageSourcePropType | undefined;
+  icon: LucideIcon;
   color: string;
   name: string;
   focused: boolean;
 };
 
-export const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
+export const TabIcon = ({ icon: Icon, color, name, focused }: TabIconProps) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const opacityAnim = useRef(new Animated.Value(0.5)).current;
   const textOpacityAnim = useRef(new Animated.Value(0)).current;
@@ -53,12 +54,7 @@ export const TabIcon = ({ icon, color, name, focused }: TabIconProps) => {
           opacity: opacityAnim,
         }}
       >
-        <Image
-          source={icon}
-          resizeMode="contain"
-          tintColor={color}
-          className="w-6 h-6"
-        />
+        <Icon size={25} color={color} />
       </Animated.View>
       {focused && (
         <Animated.View

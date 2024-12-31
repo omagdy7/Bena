@@ -1,7 +1,7 @@
-import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import { useState } from 'react'
 import React from 'react'
-import { icons } from '../constants'
+import { Eye, EyeOff } from 'lucide-react-native'
 
 type FormFieldProps = {
   title: string,
@@ -28,7 +28,7 @@ const FormField = ({ title, value, placeholder, handleChangeText, otherStyles, .
         />
         {title === 'Password' && (
           <TouchableOpacity onPress={() => { setshowPassword(!showPassword) }}>
-            <Image source={!showPassword ? icons.eye : icons.eyeHide} resizeMode='contain' className="w-6 h-6" />
+            {showPassword ? <Eye color={'white'} /> : <EyeOff color={'white'} />}
           </TouchableOpacity>
         )}
       </View>

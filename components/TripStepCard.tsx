@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { TripStep, Place } from '@/db/schema';
 import TimelineNode from './TimelineNode';
 import { Button } from './ui/button';
-import { icons } from '@/constants';
+import { MapPinned } from 'lucide-react-native';
 
 interface TripStepCardProps {
   step: TripStep & { place: Place };
@@ -76,11 +76,8 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
                 <Text className="text-white">{step.place.city}</Text>
               </TouchableOpacity>
               <Button size='icon' variant={'ghost'} className='bg-zinc-800 px-3 py-1 rounded-full'>
-                <Image className='color-white' source={icons.map_pinned}></Image>
+                <MapPinned size={20} color={'white'} />
               </Button>
-              {/* <TouchableOpacity className="bg-zinc-800 px-3 py-1 rounded-full"> */}
-              {/*   <Text className="text-white">Map</Text> */}
-              {/* </TouchableOpacity> */}
             </View>
           </View>
         </View>
