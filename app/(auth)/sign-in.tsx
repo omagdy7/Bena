@@ -7,6 +7,7 @@ import CustomButton from '@/components/CustomButton'
 import { Link, router } from 'expo-router'
 import { useAuth } from '@/context/AuthProvider'
 import { Ionicons } from '@expo/vector-icons'
+import Toast from 'react-native-toast-message'
 
 interface FormData {
   email: string
@@ -21,14 +22,24 @@ const SignIn = () => {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+
+
   const validateForm = (): boolean => {
     if (!form.email || !form.password) {
-      Alert.alert('Error', 'Please fill in all fields')
+      Toast.show({
+        type: 'error',
+        text1: "Error",
+        text2: 'Please fill in all fields'
+      });
       return false
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(form.email)) {
-      Alert.alert('Error', 'Please enter a valid email address')
+      Toast.show({
+        type: 'error',
+        text1: "Error",
+        text2: 'Please enter a valid email address'
+      });
       return false
     }
     return true
@@ -48,12 +59,14 @@ const SignIn = () => {
         router.replace("/home")
       }
     } catch (error) {
-      Alert.alert(
-        'Sign In Failed',
-        error instanceof Error
-          ? error.message
-          : 'An error occurred during sign in. Please try again.'
-      )
+      Toast.show({
+        type: 'error',
+        text1: 'Sign In Failed',
+        text2:
+          error instanceof Error
+            ? error.message
+            : 'An error occurred during sign in. Please try again.',
+      });
     } finally {
       setIsSubmitting(false)
     }

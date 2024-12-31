@@ -12,8 +12,78 @@ import { useEffect } from 'react';
 import { useFonts } from 'expo-font'
 import AuthProvider from '../context/AuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
+import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 const queryClient = new QueryClient();
+
+
+const toastConfig = {
+  success: (props) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: '#00F000', //
+        backgroundColor: '#27272a', // Tailwind's bg-zinc-800
+      }}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+        backgroundColor: '#27272a', // Ensures consistent background
+      }}
+      text1Style={{
+        fontSize: 15,
+        fontWeight: '400',
+        color: '#f4f4f5', // Light text for contrast
+      }}
+      text2Style={{
+        fontSize: 13,
+        color: '#a1a1aa', // Subtle text color
+      }}
+    />
+  ),
+  error: (props) => (
+    <ErrorToast
+      {...props}
+      style={{
+        borderLeftColor: '#ef4444', // Red for errors
+        backgroundColor: '#27272a', // Tailwind's bg-zinc-800
+      }}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+        backgroundColor: '#27272a', // Ensures consistent background
+      }}
+      text1Style={{
+        fontSize: 17,
+        fontWeight: '600',
+        color: '#f4f4f5', // Light text for contrast
+      }}
+      text2Style={{
+        fontSize: 13,
+        color: '#a1a1aa', // Subtle text color
+      }}
+    />
+  ),
+  info: (props) => (
+    <BaseToast
+      {...props}
+      style={{
+        borderLeftColor: '#2563eb', // Blue accent for info
+        backgroundColor: '#27272a', // Tailwind's bg-zinc-800
+      }}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+        backgroundColor: '#27272a',
+      }}
+      text1Style={{
+        fontSize: 15,
+        fontWeight: '400',
+        color: '#f4f4f5', // Light text for contrast
+      }}
+      text2Style={{
+        fontSize: 13,
+        color: '#a1a1aa', // Subtle text color
+      }}
+    />
+  ),
+};
 
 const LIGHT_THEME: Theme = {
   dark: false,
@@ -126,6 +196,11 @@ export default function RootLayout() {
           </Stack>
         </AuthProvider>
       </ThemeProvider>
+      <Toast
+        position='bottom'
+        bottomOffset={20}
+        config={toastConfig}
+      />
     </QueryClientProvider>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, Image, Alert, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { images } from '@/constants'
 import FormField from '@/components/FormField'
@@ -7,6 +7,7 @@ import CustomButton from '@/components/CustomButton'
 import { Link, router } from 'expo-router'
 import { useAuth } from '@/context/AuthProvider'
 import { Ionicons } from '@expo/vector-icons'
+import Toast from 'react-native-toast-message'
 
 interface FormData {
   username: string
@@ -25,16 +26,28 @@ const SignUp = () => {
 
   const validateForm = (): boolean => {
     if (!form.username || !form.email || !form.password) {
-      Alert.alert('Error', 'Please fill in all fields')
+      Toast.show({
+        type: 'error',
+        text1: "Error",
+        text2: 'Please fill in all fields'
+      });
       return false
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(form.email)) {
-      Alert.alert('Error', 'Please enter a valid email address')
+      Toast.show({
+        type: 'error',
+        text1: "Error",
+        text2: 'Please enter a valid email address'
+      });
       return false
     }
     if (form.password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long')
+      Toast.show({
+        type: 'error',
+        text1: "Error",
+        text2: 'Password must be at least 6 characters long'
+      });
       return false
     }
     return true
@@ -51,16 +64,22 @@ const SignUp = () => {
       })
 
       if (user) {
-        Alert.alert('Success', 'Account created successfully')
+        Toast.show({
+          type: 'success',
+          text1: "Success",
+          text2: 'Account created successfully'
+        });
         router.replace('/home')
       }
     } catch (error) {
-      Alert.alert(
-        'Sign Up Failed',
-        error instanceof Error
-          ? error.message
-          : 'An error occurred during sign up. Please try again.'
-      )
+      Toast.show({
+        type: 'error',
+        text1: 'Sign Up Failed',
+        text2:
+          error instanceof Error
+            ? error.message
+            : 'An error occurred during sign up. Please try again.',
+      });
     } finally {
       setIsSubmitting(false)
     }
