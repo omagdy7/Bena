@@ -197,8 +197,8 @@ export default function RootLayout() {
         </AuthProvider>
       </ThemeProvider>
       <Toast
-        position='bottom'
-        bottomOffset={20}
+        position='top'
+        topOffset={30}
         config={toastConfig}
       />
     </QueryClientProvider>
