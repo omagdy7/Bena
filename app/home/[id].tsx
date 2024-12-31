@@ -8,15 +8,79 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import FastImage from 'react-native-fast-image';
+import { useAuth } from '@/context/AuthProvider';
 
 const { width } = Dimensions.get('window');
 
 const PlaceDetails: React.FC = () => {
+  const { user } = useAuth()
   const navigation = useNavigation()
   const { id } = useLocalSearchParams();
   const [place, setPlace] = useState<Place | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+
+  // Check if place is bookmarked on component mount
+  useEffect(() => {
+    const checkBookmarkStatus = async () => {
+      if (!user || !id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('bookmarks')
+          .select('bookmark_id')
+          .eq('place_id', id)
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        setIsBookmarked(!!data);
+      } catch (err) {
+        console.error('Error checking bookmark status:', err);
+      }
+    };
+
+    checkBookmarkStatus();
+  }, [user, id]);
+
+  const handleBookmark = async () => {
+    if (!user) {
+      // Handle unauthenticated user case
+      return;
+    }
+
+    try {
+      if (isBookmarked) {
+        // Remove bookmark
+        const { error } = await supabase
+          .from('bookmarks')
+          .delete()
+          .eq('place_id', id)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        setIsBookmarked(false);
+      } else {
+        // Add bookmark
+        const { error } = await supabase
+          .from('bookmarks')
+          .insert({
+            place_id: id,
+            user_id: user.id,
+            created_at: new Date().toISOString()
+          });
+
+        if (error) throw error;
+        setIsBookmarked(true);
+      }
+    } catch (err) {
+      console.error('Error toggling bookmark:', err);
+      // You might want to show an error message to the user
+    }
+  }
+
 
   useEffect(() => {
     const fetchPlace = async () => {
@@ -74,8 +138,12 @@ const PlaceDetails: React.FC = () => {
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Ionicons name="heart-outline" size={24} color="#fff" />
+            <TouchableOpacity onPress={handleBookmark}>
+              {
+                !isBookmarked ?
+                  <Ionicons name="heart-outline" size={24} color="#fff" />
+                  : <Ionicons name="heart" size={24} color="#EA0000" />
+              }
             </TouchableOpacity>
           </View>
         </BlurView>

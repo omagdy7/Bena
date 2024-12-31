@@ -1,47 +1,103 @@
-import React, { useState } from 'react';
-import { View, FlatList } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, FlatList, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Text } from '@/components/ui/text';
 import BookmarkedTripItem from '@/components/BookmarkedTripItem';
-
-const initialBookmarkedTrips = [
-  { id: '1', name: 'Paris Getaway', image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2020&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', date: '15-20 Aug 2023' },
-  { id: '2', name: 'Tokyo Adventure', image: 'https://images.unsplash.com/photo-1554797589-7241bb691973?q=80&w=1936&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', date: '3-10 Sep 2023' },
-  { id: '3', name: 'New York City Trip', image: 'https://images.unsplash.com/photo-1548019581-99d71784d09a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', date: '22-28 Oct 2023' },
-  { id: '4', name: 'Bali Relaxation', image: 'https://plus.unsplash.com/premium_photo-1677829177642-30def98b0963?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', date: '5-12 Nov 2023' },
-  { id: '5', name: 'London Explorer', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', date: '1-7 Dec 2023' },
-];
+import { useUserBookmarks } from '@/hooks/useUserBookmarks';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { supabase } from '@/lib/supabase';
+import { useAuthCheck } from '@/hooks/useAuthCheck';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
 
 const BookmarkScreen = () => {
-  const [bookmarkedTrips, setBookmarkedTrips] = useState(initialBookmarkedTrips);
+  const { bookmarkedPlaces, loading, error, refetch } = useUserBookmarks();
+  const user = useAuthCheck()
+  const queryClient = useQueryClient();
 
-  const handleRemoveBookmark = (id: string) => {
-    setBookmarkedTrips(prevTrips => prevTrips.filter(trip => trip.id !== id));
+  const { mutate: removeBookmark } = useMutation({
+    mutationFn: async (placeId: string) => {
+      if (!user?.id) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('bookmarks')
+        .delete()
+        .eq('place_id', placeId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the bookmarks query
+      queryClient.invalidateQueries({ queryKey: ['bookmarks', user?.id] });
+
+      Toast.show({
+        type: 'success',
+        text1: 'Bookmark removed successfully',
+      });
+    },
+    onError: (error) => {
+      console.error('Error removing bookmark:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to remove bookmark',
+        text2: error instanceof Error ? error.message : 'Please try again later',
+      });
+    }
+  });
+
+  const handleRemoveBookmark = async (placeId: string) => {
+    removeBookmark(placeId);
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 bg-zinc-900 justify-center items-center">
+        <ActivityIndicator size="large" color="#fcbf49" />
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView className="flex-1 bg-zinc-900 justify-center items-center">
+        <Text className="text-red-500 text-center">{error}</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-900">
       <StatusBar style="light" />
-      <View className="px-4 py-6">
+      <Animated.View
+        entering={FadeInDown.duration(500)}
+        className="px-4 py-6 flex-1"
+      >
         <Text className="text-3xl font-bold text-white mb-6">Your Bookmarks</Text>
-        <FlatList
-          data={bookmarkedTrips}
-          renderItem={({ item, index }) => (
-            <BookmarkedTripItem
-              item={item}
-              index={index}
-              onRemoveBookmark={handleRemoveBookmark}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        />
-      </View>
+        {bookmarkedPlaces.length === 0 ? (
+          <Text className="text-white text-center mt-10">You haven't bookmarked any places yet.</Text>
+        ) : (
+          <FlatList
+            data={bookmarkedPlaces}
+            renderItem={({ item, index }) => (
+              <BookmarkedTripItem
+                item={item}
+                index={index}
+                onRemoveBookmark={handleRemoveBookmark}
+              />
+            )}
+            keyExtractor={(item) => item.places_id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            refreshing={loading}
+            onRefresh={refetch}
+          />
+        )}
+      </Animated.View>
     </SafeAreaView>
   );
 };
 
 export default BookmarkScreen;
-
