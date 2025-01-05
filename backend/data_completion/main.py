@@ -227,6 +227,46 @@ def fetch_data_from_supabase():
     # print(response.data)
     return response.data
 
+def clean_tags(tags):
+    # Split the tags into a list
+    tags_list = tags.split(", ")
 
-csv_file_path = "data_sets/places_imgs.csv"
-read_places_from_csv(csv_file_path)
+    # Define a list of keywords to remove article-related tags
+    article_keywords = [
+        "articles", "Article", "containing", "CS1", "Infobox", "Pages", "short description",
+        "Coordinates", "Wikidata", "Kartographer", "WikiMiniAtlas"
+    ]
+
+    # Filter out tags that contain article-related keywords
+    cleaned_tags = [tag for tag in tags_list if not any(keyword.lower() in tag.lower() for keyword in article_keywords)]
+
+    # Return the cleaned tags as a string
+    return ", ".join(cleaned_tags)
+
+def clean():
+    # Fetch data from the 'places' table
+    response = supabase.table("places").select("places_id, tags").execute()
+
+    if len(response.data) > 0:
+        places_data = response.data
+
+        for place in places_data:
+            places_id = place["places_id"]
+            tags = place["tags"]
+
+            if tags:
+                # Clean the tags
+                cleaned_tags = clean_tags(tags)
+
+                print(cleaned_tags)
+
+                # Update the cleaned tags back to the database
+                supabase.table("places").update({"tags": cleaned_tags}).eq("places_id", places_id).execute()
+
+        print("Tags cleaned and updated successfully!")
+    else:
+        print("No data found in the places table.")
+
+clean()
+# csv_file_path = "data_sets/places_imgs.csv"
+# read_places_from_csv(csv_file_path)
