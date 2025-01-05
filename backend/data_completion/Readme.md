@@ -1,5 +1,8 @@
 installed packages
 
 ```bash
-pip install python-dotenv supabase googlemaps wikipediaapi
+pip install python-dotenv
+pip install supabase
+pip install googlemaps
+pip install Wikipedia-API
 ```

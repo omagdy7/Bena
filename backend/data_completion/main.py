@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import re
 import os
 import csv
 from supabase import create_client, Client
@@ -24,6 +25,123 @@ wiki = wikipediaapi.Wikipedia(user_agent=user_agent)
 
 
 # inserting famous places in Egypt
+
+def search_place_in_maps(place_name: str):
+
+    maps_data = {
+        "name": place_name,
+        "address": "Default address",
+        "latitude": 0.0,
+        "longitude": 0.0,
+        "category": "Default Type",
+        "external_link": "No external link yet",
+        "city": "Default city",
+        "tags": "Default tags",
+        "maps_id": "NOT AVAILABLE",
+    }
+    results = gmaps.places(query=place_name)
+    if results['status'] == 'OK' and results['results']:
+        place_info = results['results'][0]
+        maps_data["address"] = place_info["formatted_address"]
+        maps_data["latitude"] = place_info["geometry"]["location"]["lat"]
+        maps_data["longitude"] = place_info["geometry"]["location"]["lng"]
+        maps_data["category"] = place_info["types"][0]
+        maps_data["maps_id"] = place_info["place_id"]
+        # extract the city from the address
+        formated_address = place_info["formatted_address"].split(',')[-2]
+        cleaned_formated_address = re.sub(r'\d+', '', formated_address).strip()
+        maps_data["city"] = cleaned_formated_address    
+        # fetch the place more detailed info
+        place = gmaps.place(place_id=maps_data["maps_id"])
+        # get the place maps url from the place details
+        maps_data["external_link"] = place["result"]["url"]
+        
+    return maps_data
+
+def search_place_in_wiki(place_name: str):
+    wiki_data = {
+        "description": "No description yet",
+        "arabic_name": "Not available yet",
+        "tags": "Not available yet",
+    }
+    page = wiki.page(place_name)
+    
+    if page.exists():
+        wiki_data["description"] = f"{page.summary[:500]}"
+
+        # Get categories for the page and clean them
+        categories = page.categories
+        cleaned_categories = [category.replace("Category:", "") for category in categories.keys()]
+        # Combine all categories into a single string
+        wiki_data["tags"] = ", ".join(cleaned_categories)
+        
+        if 'ar' in page.langlinks:
+            arabic_page = page.langlinks['ar']
+            wiki_data["arabic_name"] = arabic_page.title
+    else:
+        print(f"Page for {place_name} does not exist.")
+    return wiki_data
+
+def read_places_from_csv(csv_file_path: str):
+    
+    exported_places = []
+    # Dictionary to store unique places
+    unique_places = {}
+    places = []
+
+    # Reading Places Dataset
+    try:
+        with open(csv_file_path, mode="r", encoding="utf-8") as file:
+            reader = csv.DictReader(file) # read the csv file
+
+            # Cleaning Redundant places
+            for row in reader:
+                place_landmark = row["landmark_id"]
+                if place_landmark not in unique_places:
+                    unique_places[place_landmark] = 1
+                    places.append(row)
+            print("number of new data:", len(places))
+
+            # Loop through rows in the cleaned places names data
+            for row in places:
+                place_name = row["name"].replace('_', ' ') # get the place name and replace the clean it
+
+                # Query Google Places API
+                maps_place_info = search_place_in_maps(place_name)
+                
+                # Query Wikipedia API
+                wiki_place_info = search_place_in_wiki(place_name)
+
+                #  Mapping to database columns
+                data = {
+                    "name": place_name, # from main dataset
+                    "image": row["url"], # from main dataset
+                    # from google maps
+                    "address": maps_place_info["address"],
+                    "category": maps_place_info["category"],
+                    "latitude": maps_place_info["latitude"],
+                    "longitude": maps_place_info["longitude"],
+                    "external_link": maps_place_info["external_link"],
+                    "city": maps_place_info["city"],
+                    "maps_id": maps_place_info["maps_id"],
+                    # from wikipedia
+                    "description": wiki_place_info["description"],
+                    "arabic_name": wiki_place_info["arabic_name"],
+                    "tags": wiki_place_info["tags"],
+                    "location": "Default location",
+                    "rating": 0.0,  
+                }
+
+                exported_places.append(data)
+
+                # Insert into the Supabase table
+                # response = supabase.table("places").insert(data).execute()
+                
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    
+    return exported_places
+
 def insert_data_from_csv(csv_file_path: str):
     # Dictionary to store unique places
     unique_places = {}
@@ -104,6 +222,11 @@ def insert_data_from_csv(csv_file_path: str):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-# # Getting started
-# csv_file_path = "data_sets/places_imgs.csv"
-# insert_data_from_csv(csv_file_path)
+def fetch_data_from_supabase():
+    response = supabase.table("places").select("*").execute()
+    # print(response.data)
+    return response.data
+
+
+csv_file_path = "data_sets/places_imgs.csv"
+read_places_from_csv(csv_file_path)
