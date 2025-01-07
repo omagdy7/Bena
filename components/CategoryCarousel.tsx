@@ -1,19 +1,20 @@
 import React, { useRef, useState } from 'react';
 import { View, Dimensions, Animated, PanResponder } from 'react-native';
 import { Text } from '@/components/ui/text';
-import { Place } from '@/db/schema';
 import { LinearGradient } from 'expo-linear-gradient';
 import FastImage from 'react-native-fast-image';
+import { PlaceSubset } from '@/hooks/usePlaces';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.85;
 
 interface CategoryCarouselProps {
-  places: Place[];
+  places: PlaceSubset[] | null;
   onPlacePress: (placeId: string) => void;
 }
 
 export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ places, onPlacePress }) => {
+  console.log("PLACES: ", places)
   const [currentIndex, setCurrentIndex] = useState(0);
   const position = useRef(new Animated.Value(0)).current;
   const MAX_VISIBLE_DOTS = 5;
@@ -46,14 +47,14 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ places, onPl
 
       // If it's a tap (short duration, minimal movement)
       if (touchDuration < 200 && touchDistance < 10) {
-        onPlacePress(places[currentIndex].places_id);
+        onPlacePress(places![currentIndex].places_id);
         return;
       }
 
       // Handle swipe
       const minSwipeDistance = 50;
       if (Math.abs(dx) > minSwipeDistance) {
-        if (dx < 0 && currentIndex < places.length - 1) {
+        if (dx < 0 && currentIndex < places!.length - 1) {
           setCurrentIndex(current => current + 1);
         } else if (dx > 0 && currentIndex > 0) {
           setCurrentIndex(current => current - 1);
@@ -73,11 +74,11 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ places, onPl
     },
   });
 
-  const currentPlace = places[currentIndex];
+  const currentPlace = places![currentIndex];
 
   const generateVisibleDots = () => {
-    if (places.length <= MAX_VISIBLE_DOTS) {
-      return places.map((_, index) => index);
+    if (places!.length <= MAX_VISIBLE_DOTS) {
+      return places!.map((_, index) => index);
     }
 
     let start = currentIndex - Math.floor(MAX_VISIBLE_DOTS / 2);
@@ -86,9 +87,9 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ places, onPl
     if (start < 0) {
       start = 0;
       end = MAX_VISIBLE_DOTS - 1;
-    } else if (end >= places.length) {
-      end = places.length - 1;
-      start = places.length - MAX_VISIBLE_DOTS;
+    } else if (end >= places!.length) {
+      end = places!.length - 1;
+      start = places!.length - MAX_VISIBLE_DOTS;
     }
 
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
@@ -110,7 +111,7 @@ export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ places, onPl
         >
           <FastImage
             source={{
-              uri: currentPlace.image,
+              uri: currentPlace.image ? currentPlace.image : 'https://placehold.co/600x400',
               priority: FastImage.priority.normal,
             }}
             style={{ width: '100%', height: '100%' }}

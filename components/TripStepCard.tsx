@@ -26,6 +26,13 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
   isLast,
   totalSteps
 }) => {
+
+  const handleOnMapPress = () => {
+    // TODO: When the user clicks on the map it should open google maps on the phone and automatically naviagtes to the place
+
+  }
+
+
   const progress = step.status === 'visited' ? 1 : step.status === 'pending' ? 0 : 0.5;
 
   return (
@@ -75,7 +82,7 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
               <TouchableOpacity className="bg-zinc-800 px-3 py-1 rounded-full">
                 <Text className="text-white">{step.place.city}</Text>
               </TouchableOpacity>
-              <Button size='icon' variant={'ghost'} className='bg-zinc-800 px-3 py-1 rounded-full'>
+              <Button size='icon' variant={'ghost'} className='bg-zinc-800 px-3 py-1 rounded-full' onPress={handleOnMapPress}>
                 <MapPinned size={20} color={'white'} />
               </Button>
             </View>

@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { View, FlatList, ActivityIndicator } from 'react-native';
+import { FlatList, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Text } from '@/components/ui/text';
