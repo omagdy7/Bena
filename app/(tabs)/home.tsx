@@ -18,7 +18,6 @@ import { Ionicons } from '@expo/vector-icons';
 import CustomSuspense from '@/components/CustomSuspense';
 import HomeSkeleton from '@/components/HomeSkeleton';
 import RecommendationCarousel from '@/components/RecommendationCarousel';
-import { UsePlacesResult } from '@/hooks/usePlaces';
 import { PlaceSubset } from '@/hooks/usePlaces';
 import { Hero } from '@/components/Hero';
 
@@ -28,7 +27,7 @@ const HEADER_HEIGHT = height * 0.4;
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList);
 
 const HomeContent: React.FC = () => {
-  const { categorizedPlaces, error, refetch }: UsePlacesResult = usePlaces();
+  const { categorizedPlaces, error, refetch } = usePlaces();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const router = useRouter();
   const scrollY = useSharedValue(0);
@@ -80,9 +79,10 @@ const HomeContent: React.FC = () => {
   return (
     <View className="flex-1 bg-zinc-900">
 
+
       <AnimatedFlashList
         data={categorizedPlaces}
-        keyExtractor={(item: unknown, _: number) => {
+        keyExtractor={(item: unknown, index: number) => {
           const [category] = item as [string, PlaceSubset[]]; // Type assertion
           return category;
         }}
@@ -114,6 +114,7 @@ const HomeContent: React.FC = () => {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
       />
+
       <Animated.View
         className="absolute top-12 left-4 right-4 flex-row justify-between items-center"
         style={headerAnimatedStyle}

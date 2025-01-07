@@ -14,7 +14,6 @@ interface CategoryCarouselProps {
 }
 
 export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ places, onPlacePress }) => {
-  console.log("PLACES: ", places)
   const [currentIndex, setCurrentIndex] = useState(0);
   const position = useRef(new Animated.Value(0)).current;
   const MAX_VISIBLE_DOTS = 5;
