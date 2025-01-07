@@ -1,6 +1,6 @@
 # backend models
-from app.cat_model import recommend_places
-from app.cat_model import users_has_interactions
+from app.recommendation_model import recommend_places
+from app.recommendation_model import users_has_interactions
 # FastAPI
 from typing import Union
 from fastapi import FastAPI

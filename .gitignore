@@ -46,3 +46,8 @@ app-example
 
 # APIs
 *.env
+
+# python cahce
+__pycache__/
+__pycache__
+__pycache__/*
