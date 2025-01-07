@@ -8,6 +8,9 @@ import csv
 from supabase import create_client, Client
 import googlemaps
 import wikipediaapi
+from geopy.geocoders import Nominatim
+import numpy as np 
+import pandas as pd 
 
 # initialize supabase connection
 url: str = os.environ.get("SUPABASE_URL")
@@ -25,6 +28,23 @@ wiki = wikipediaapi.Wikipedia(user_agent=user_agent)
 
 
 # inserting famous places in Egypt
+
+def search_place_in_geopy(place_name: str):
+    geolocator = Nominatim(user_agent="Socrate")
+
+    # Get location details (latitude and longitude)
+    location = geolocator.geocode(place_name)
+
+    # If location is found, search nearby places on Wikipedia
+    if location:
+        print(f"Location found: {location.address}")
+        search_results = search_place_in_wiki(' '.join([location.address.split(',')[0]]))
+        return search_results
+        # print(search_results)
+    else:
+        print("Location not found.")
+
+    return None
 
 def search_place_in_maps(place_name: str):
 
@@ -227,6 +247,44 @@ def fetch_data_from_supabase():
     # print(response.data)
     return response.data
 
+def fetch_places_dataframes():
+    # fetch places data from database into dataframe
+    table_name = "places"
+    response = supabase.table(table_name).select("*").execute()
+    data = response.data
+    places_df = pd.DataFrame(data)
+    return places_df
+
+def update_tags_dataframe(df: pd.DataFrame):
+    for _, row in df.iterrows():
+        updated_place = {
+            "tags": row["tags"],  # Set the updated tags
+            "description": row["description"],  # Set the updated description
+            "arabic_name": row["arabic_name"],  # Set the updated arabic name
+        }
+
+        # Update the row in Supabase by places_id
+        supabase.table('places').update(updated_place).eq('places_id', row['places_id']).execute()
+        print(row['places_id'])
+        exit()
+
+    print("Updated places with new tags.")
+
+
+def search_more_wiki():
+    places_df = fetch_places_dataframes()
+    places_with_no_tag = places_df[places_df['tags'] == 'Not available yet']
+    print(places_with_no_tag.shape)
+    exit()
+    for _, row in places_with_no_tag.iterrows():
+        updated_place = search_place_in_geopy(row['name'])
+        if updated_place:
+            place_updates = {
+                "tags": updated_place['tags'],  # Set the updated tags
+                "description": updated_place['description'],  # Set the updated description
+                "arabic_name": updated_place["arabic_name"],  # Set the updated arabic name
+            }
+            supabase.table('places').update(place_updates).eq('places_id', row['places_id']).execute()
 def clean_tags(tags):
     # Split the tags into a list
     tags_list = tags.split(", ")
@@ -257,9 +315,8 @@ def clean():
             if tags:
                 # Clean the tags
                 cleaned_tags = clean_tags(tags)
-
+                # print the cleaned tags
                 print(cleaned_tags)
-
                 # Update the cleaned tags back to the database
                 supabase.table("places").update({"tags": cleaned_tags}).eq("places_id", places_id).execute()
 
@@ -267,6 +324,6 @@ def clean():
     else:
         print("No data found in the places table.")
 
+
+
 clean()
-# csv_file_path = "data_sets/places_imgs.csv"
-# read_places_from_csv(csv_file_path)

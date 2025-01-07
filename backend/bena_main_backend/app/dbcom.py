@@ -13,8 +13,25 @@ url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
-table_name = "places"
-response = supabase.table(table_name).select("*").execute()
+def get_places():
+    # get all places from supabase
+    table_name = "places"
+    response = supabase.table(table_name).select("*").execute()
+    return response
+
+def get_place(place_id):
+    # get all places from supabase
+    table_name = "places"
+    response = supabase.table(table_name).select("*").eq("places_id", place_id).execute()
+    return response.data
+
+def get_places_dataframe():
+    # get all places from supabase
+    table_name = "places"
+    response = supabase.table(table_name).select("*").execute()
+    return pd.DataFrame(response.data)
+
+
 
 # Adding basic database client
 

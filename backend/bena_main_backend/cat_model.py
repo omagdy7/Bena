@@ -1,1 +1,0 @@
-# create auto categorization model and its auto generated Trips
