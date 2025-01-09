@@ -81,10 +81,16 @@ const HomeContent: React.FC = () => {
       <AnimatedFlashList
         data={categorizedPlaces}
         keyExtractor={(item: unknown, index: number) => {
-          const [category] = item as [string, PlaceSubset[]]; // Type assertion
-          return category;
+          if (Array.isArray(item) && item.length > 0) {
+            const [category] = item as [string, PlaceSubset[]];
+            return category;
+          }
+          return `item-${index}`;
         }}
         renderItem={(info: { item: unknown; index: number }) => {
+          if (!Array.isArray(info.item) || info.item.length !== 2) {
+            return null; // or return a fallback component
+          }
           const [category, categoryPlaces] = info.item as [string, PlaceSubset[]]; // Type assertion
           return (
             <Animated.View
