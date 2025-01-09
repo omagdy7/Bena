@@ -28,8 +28,6 @@ export const useRecommendations = () => {
       }
       return response.json();
     },
-    enabled: !!user?.id, // Only run query if we have a user ID
-    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
   });
 
   return {

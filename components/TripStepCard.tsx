@@ -50,7 +50,9 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
       >
         <View className="p-4">
           <View className="flex-row justify-between items-center mb-3">
-            <Text className="text-white text-lg font-bold">{step.place.name}</Text>
+            <Text className="text-white text-lg font-bold">
+              {step.place.name}
+            </Text>
             <TouchableOpacity
               onPress={onEdit}
               className="bg-zinc-800 p-2 rounded-full"
@@ -75,7 +77,7 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
 
           <View className="flex-row justify-between items-center">
             <View>
-              <Text className="text-zinc-400 mb-1">{step.place.address}</Text>
+              {/* <Text className="text-zinc-400 mb-1">{step.place.address.slice(0, 13)}</Text> */}
               <RatingStars rating={step.place.rating} />
             </View>
             <View className="flex-row gap-2">

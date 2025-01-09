@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { View, ScrollView, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Text } from '@/components/ui/text';
@@ -11,6 +12,7 @@ import { usePlaces } from '@/hooks/usePlaces';
 import { useUserBookmarks } from '@/hooks/useUserBookmarks';
 import { useRecommendations } from '@/hooks/useRecommendations';
 import { FlashList } from '@shopify/flash-list';
+import { router } from 'expo-router';
 
 interface Place {
   places_id: string;
@@ -82,7 +84,10 @@ const PlaceCard: React.FC<{ place: Place; onSelect: (place: Place) => void; isSe
         colors={['rgba(26, 12, 35, 0.9)', 'rgba(5, 8, 2, 0.9)']}
         className="p-4"
       >
-        <Image source={{ uri: place.image }} className="w-full h-40 rounded-lg mb-3" />
+        <FastImage source={{ uri: place.image, priority: 'high' }}
+          style={{ width: '100%', height: 160, marginBottom: 12, borderRadius: 8 }}
+          resizeMode='cover'
+        />
         <Text className="text-white text-lg font-bold mb-1">{place.name}</Text>
         <Text className="text-gray-300 text-sm mb-2">{place.category} • {place.city}</Text>
         <Text className="text-gray-400 text-xs mb-2" numberOfLines={2}>{place.description}</Text>
@@ -90,7 +95,7 @@ const PlaceCard: React.FC<{ place: Place; onSelect: (place: Place) => void; isSe
         <View className="absolute top-2 right-2 bg-black/50 rounded-full p-2">
           <Ionicons
             name={isSelected ? "checkmark-circle" : "add-circle-outline"}
-            size={24}
+            size={20}
             color={isSelected ? "#fcbf49" : "white"}
           />
         </View>
@@ -107,6 +112,13 @@ const ChoosePlacesScreen: React.FC = () => {
   const { bookmarkedPlaces, loading: loadingBookmarks } = useUserBookmarks();
   const { recommendations, loading: loadingRecommendations } = useRecommendations();
 
+  const handleConfirmSelection = () => {
+    // Convert selected places to a JSON string and pass it back to the CreateTrip screen
+    const selectedPlacesJson = JSON.stringify(selectedPlaces);
+    router.back();
+    router.setParams({ selectedPlaces: selectedPlacesJson })
+  };
+
 
   const handleSelectPlace = useCallback((place: Place) => {
     setSelectedPlaces(prev =>
@@ -117,7 +129,7 @@ const ChoosePlacesScreen: React.FC = () => {
   }, []);
 
   const renderPlaces = useCallback((places: Place[]) => (
-    <FlashList
+    <FlatList
       data={places}
       keyExtractor={(item) => item.places_id}
       renderItem={({ item }) => (
@@ -129,7 +141,7 @@ const ChoosePlacesScreen: React.FC = () => {
         />
       )}
       showsVerticalScrollIndicator={false}
-      estimatedItemSize={312}
+    // estimatedItemSize={312}
     />
   ), [handleSelectPlace, selectedPlaces]);
 
@@ -199,9 +211,11 @@ const ChoosePlacesScreen: React.FC = () => {
 
         <TouchableOpacity
           className="mt-4 bg-secondary py-3 rounded-full"
-          onPress={() => console.log('Selected places:', selectedPlaces)}
+          onPress={handleConfirmSelection}
         >
-          <Text className="text-center text-zinc-900 font-bold">Confirm Selection</Text>
+          <Text className="text-center text-zinc-900 font-bold">
+            Confirm Selection ({selectedPlaces.length} places)
+          </Text>
         </TouchableOpacity>
       </LinearGradient>
     </SafeAreaView>

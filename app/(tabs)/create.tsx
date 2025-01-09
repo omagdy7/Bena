@@ -1,37 +1,50 @@
-import React, { useState } from 'react';
-import { View, ScrollView, TouchableOpacity, TextInput, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Text } from '@/components/ui/text';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import Animated, { FadeInDown, FadeInRight, FadeOutRight } from 'react-native-reanimated';
 import CustomButton from '@/components/CustomButton';
 import { BlurView } from 'expo-blur';
-import { TripStep } from '@/db/schema';
+import { TripStep, Place } from '@/db/schema';
+import { supabase } from '@/lib/supabase';
+import { useAuthCheck } from '@/hooks/useAuthCheck';
 
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 const CreateTrip: React.FC = () => {
+  const params = useLocalSearchParams();
+  const user = useAuthCheck()
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [steps, setSteps] = useState<Partial<TripStep>[]>([]);
+  const [steps, setSteps] = useState<(Partial<TripStep> & { place?: Place })[]>([]);
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [showStepStartTimePicker, setShowStepStartTimePicker] = useState(false);
   const [showStepEndTimePicker, setShowStepEndTimePicker] = useState(false);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
 
-  const addStep = () => {
-    setSteps([...steps, {
-      step_num: steps.length + 1,
-      start_time: new Date(),
-      end_time: new Date(),
-      status: 'pending'
-    }]);
+  useEffect(() => {
+    if (params.selectedPlaces) {
+      const selectedPlaces = JSON.parse(params.selectedPlaces as string) as Place[];
+      const newSteps = selectedPlaces.map((place, index) => ({
+        step_num: steps.length + index + 1,
+        place_id: place.places_id,
+        place: place,
+        start_time: new Date(),
+        end_time: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours later
+        status: 'pending' as const
+      }));
+      setSteps([...steps, ...newSteps]);
+    }
+  }, [params.selectedPlaces]);
+
+  const addSteps = () => {
+    router.push('/choosePlace');
   };
 
   const removeStep = (index: number) => {
@@ -67,24 +80,57 @@ const CreateTrip: React.FC = () => {
     }
   };
 
-  const handleCreateTrip = () => {
-    // Implement trip creation logic here
-    console.log('Creating trip:', { title, description, startDate, endDate, status, steps });
-    router.push('/home');
+
+  const handleCreateTrip = async () => {
+    const tripData = {
+      title,
+      description,
+      "user_id": user?.id,
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      "status": 'in_progress'
+    };
+
+    try {
+      // Insert the trip into the 'trip' table
+      const { data: trip, error: tripError } = await supabase
+        .from('trips')
+        .insert([tripData])
+        .select('trip_id')
+        .single();
+
+      if (tripError) throw tripError;
+
+      // Insert each step into the 'trip_step' table
+      const stepsData = steps.map((step, index) => ({
+        trip_id: trip.trip_id,
+        step_num: step.step_num,
+        place_id: step.place_id,
+        start_time: step.start_time.toISOString(),
+        end_time: step.end_time.toISOString(),
+        status: index === 0 ? 'in_progress' : 'pending', // First step is 'in_progress', others are 'pending'
+      }));
+
+      const { error: stepsError } = await supabase
+        .from('tripstep')
+        .insert(stepsData);
+
+      if (stepsError) throw stepsError;
+
+      console.log('Trip created successfully:', trip);
+      router.push(`/trips/${trip.trip_id}`);
+    } catch (error) {
+      console.error('Error creating trip:', error);
+    }
   };
+
+
+
+
 
   const handleGenerateAITrip = () => {
     // TODO: Implement AI trip generation logic here
     console.log('Generating AI trip');
-
-    // For now, let's just add a mock step
-    setSteps([...steps, {
-      step_num: steps.length + 1,
-      place_id: 'AI Generated Place',
-      start_time: new Date(),
-      end_time: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours later
-      status: 'pending'
-    }]);
   };
 
   return (
@@ -156,13 +202,16 @@ const CreateTrip: React.FC = () => {
                   <Ionicons name="close-circle-outline" size={24} color="white" />
                 </TouchableOpacity>
               </View>
-              <TextInput
-                className="bg-zinc-700 text-white px-3 py-2 rounded-md mb-2"
-                placeholder="Place Name"
-                placeholderTextColor="#a1a1aa"
-                value={step.place_id}
-                onChangeText={(text) => updateStep(index, 'place_id', text)}
-              />
+              {step.place && (
+                <View className="mb-2">
+                  <Image
+                    source={{ uri: step.place.image }}
+                    className="w-full h-32 rounded-lg mb-2"
+                    resizeMode="cover"
+                  />
+                  <Text className="text-white font-semibold">{step.place.name}</Text>
+                </View>
+              )}
               <View className="flex-row justify-between mb-2">
                 <TouchableOpacity
                   className="bg-zinc-700 px-3 py-2 rounded-md flex-1 mr-2"
@@ -183,36 +232,23 @@ const CreateTrip: React.FC = () => {
                   <Text className="text-white">End: {step.end_time?.toLocaleTimeString()}</Text>
                 </TouchableOpacity>
               </View>
-              <View className="flex-row">
-                {['pending', 'visited', 'skipped'].map((s) => (
-                  <TouchableOpacity
-                    key={s}
-                    className={`px-3 py-1 rounded-full mr-2 ${step.status === s ? 'bg-secondary' : 'bg-zinc-700'}`}
-                    onPress={() => updateStep(index, 'status', s)}
-                  >
-                    <Text className={`${step.status === s ? 'text-zinc-900' : 'text-white'} text-sm`}>
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
             </Animated.View>
           ))}
           <TouchableOpacity
             className="bg-zinc-800 p-4 rounded-lg items-center mb-4"
-            onPress={() => { router.push('/choosePlace') }}
+            onPress={addSteps}
           >
             <Ionicons name="add-circle-outline" size={24} color="white" />
-            <Text className="text-white mt-2">Add Step</Text>
+            <Text className="text-white mt-2">Add Steps</Text>
           </TouchableOpacity>
         </Animated.View>
 
-        <Animated.View className="mt-10" entering={FadeInDown.delay(700).duration(500).springify()}>
+        <Animated.View entering={FadeInDown.delay(700).duration(500).springify()}>
           <CustomButton
             title="Generate Trip with AI"
             handlePress={handleGenerateAITrip}
             icon="bulb-outline"
-            containerStyles="mb-4"
+            containerStyles="mb-8"
           />
         </Animated.View>
       </ScrollView>

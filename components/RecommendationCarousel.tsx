@@ -7,27 +7,27 @@ import { FadeInRight } from 'react-native-reanimated';
 
 export default function RecommendationCarousel() {
   const router = useRouter();
-  const { data, isLoading, isError, error } = useRecommendations();
+  const { recommendations, loading, error } = useRecommendations();
 
   const handlePlacePress = (placeId: string) => {
     router.push(`/home/${placeId}`);
   };
 
-  if (isLoading) {
+  if (loading) {
     return <RecommendationSkeleton />;
   }
 
-  if (isError) {
+  if (error) {
     return (
       <View className="p-4">
         <Text className="text-red-500">
-          {error?.message || 'Failed to load recommendations'}
+          {error || 'Failed to load recommendations'}
         </Text>
       </View>
     );
   }
 
-  if (!data?.recommendations?.length) {
+  if (!recommendations?.length) {
     return null; // Or render a "No recommendations" message
   }
 
@@ -40,7 +40,7 @@ export default function RecommendationCarousel() {
         Recommended for You
       </Text>
       <CategoryCarousel
-        places={data.recommendations}
+        places={recommendations}
         onPlacePress={handlePlacePress}
       />
     </Animated.View>
