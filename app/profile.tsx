@@ -130,7 +130,7 @@ const Profile = () => {
 
           <TouchableOpacity
             className="bg-zinc-800 py-3 px-4 rounded-lg mb-4 flex-row items-center justify-between"
-            onPress={() => router.replace('/settings')}
+            onPress={() => router.push('/settings')}
           >
             <Text className="text-white font-semibold">Settings</Text>
             <Ionicons name="settings-outline" size={24} color="white" />
