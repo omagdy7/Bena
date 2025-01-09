@@ -100,7 +100,7 @@ const TripTimeline = () => {
         <Text className="text-white text-lg mb-4">No ongoing trips found.</Text>
         <TouchableOpacity
           className="bg-blue-500 px-6 py-3 rounded-lg"
-          onPress={() => router.replace('/create')}
+          onPress={() => router.push('/create')}
         >
           <Text className="text-white">Create a New Trip</Text>
         </TouchableOpacity>
