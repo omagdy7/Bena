@@ -6,7 +6,7 @@ interface CustomButtonProps {
   title: string;
   handlePress: () => void;
   isLoading?: boolean;
-  icon: typeof Ionicons;
+  icon: keyof typeof Ionicons.glyphMap;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({

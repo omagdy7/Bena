@@ -27,18 +27,18 @@ export async function insertRow(tableName: string, payload: any) {
  * @param match - The conditions to match the row.
  * @param payload - The updated data.
  */
-export async function updateRow(tableName: string, match: any, payload: any) {
-  const { data, error } = await supabase.from(tableName).update(payload).match(match).single();
-  if (error) throw new Error(`Error updating ${tableName}: ${error.message}`);
-  return data;
-}
+// export async function updateRow(tableName: string, match: any, payload: any) {
+//   const { data, error } = await supabase.from(tableName).update(payload).match(match).single();
+//   if (error) throw new Error(`Error updating ${tableName}: ${error.message}`);
+//   return data;
+// }
 
 /**
  * Generic function to delete a row in a table.
  * @param tableName - Name of the table.
  * @param match - The conditions to match the row.
  */
-export async function deleteRow(tableName: string, match: any): Promise<void> {
-  const { error } = await supabase.from(tableName).delete().match(match);
-  if (error) throw new Error(`Error deleting from ${tableName}: ${error.message}`);
-}
+// export async function deleteRow(tableName: string, match: any): Promise<void> {
+//   const { error } = await supabase.from(tableName).delete().match(match);
+//   if (error) throw new Error(`Error deleting from ${tableName}: ${error.message}`);
+// }

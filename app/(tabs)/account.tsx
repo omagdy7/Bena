@@ -67,12 +67,6 @@ export default function Account() {
           </Avatar>
         </View>
 
-        {/* User Info */}
-        <View className="mb-8">
-          <Text className="text-white text-2xl font-semibold">{profile?.username || 'User'}</Text>
-          <Text className="text-gray-400 text-base">{user?.email || 'email@example.com'}</Text>
-        </View>
-
         {/* Menu List */}
         <FlatList
           data={menuItems}

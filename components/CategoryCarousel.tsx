@@ -3,7 +3,7 @@ import { View, Dimensions, Animated, PanResponder } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { LinearGradient } from 'expo-linear-gradient';
 import FastImage from 'react-native-fast-image';
-import { PlaceSubset } from '@/hooks/usePlaces';
+import { PlaceSubset } from '@/hooks/useCategoricalPlaces';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.85;

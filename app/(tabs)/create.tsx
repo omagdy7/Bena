@@ -9,7 +9,7 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import Animated, { FadeInDown, FadeInRight, FadeOutRight } from 'react-native-reanimated';
 import CustomButton from '@/components/CustomButton';
 import { BlurView } from 'expo-blur';
-import { Place, TripStep } from '@/db/schema';
+import { TripStep } from '@/db/schema';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 

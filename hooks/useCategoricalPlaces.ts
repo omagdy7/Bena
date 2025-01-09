@@ -43,7 +43,7 @@ const fetchPlaces = async (): Promise<[string, PlaceSubset[]][]> => {
   return categoriesWithPlaces;
 };
 
-export const usePlaces = () => {
+export const useCategoricalPlaces = () => {
   const {
     data: categorizedPlaces = [],
     isLoading: loading,

@@ -8,7 +8,7 @@ interface RecommendationResponse {
 
 export const useRecommendations = () => {
   const user = useAuthCheck();
-  const RECOMMENDATION_ENDPOINT = process.env['RECOMMENDATION_MODEL_ENDPOINT'];
+  const RECOMMENDATION_ENDPOINT = process.env.EXPO_PUBLIC_RECOMMENDATION_MODEL_ENDPOINT;
 
   return useQuery<RecommendationResponse, Error>({
     queryKey: ['recommendations', user?.id],

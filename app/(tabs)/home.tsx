@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { View, RefreshControl, Dimensions } from 'react-native';
 import { Text } from '@/components/ui/text';
-import { usePlaces } from '@/hooks/usePlaces';
+import { useCategoricalPlaces } from '@/hooks/useCategoricalPlaces';
 import { useRouter } from 'expo-router';
 import { CategoryCarousel } from '@/components/CategoryCarousel';
 import { FlashList } from '@shopify/flash-list';
@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import CustomSuspense from '@/components/CustomSuspense';
 import HomeSkeleton from '@/components/HomeSkeleton';
 import RecommendationCarousel from '@/components/RecommendationCarousel';
-import { PlaceSubset } from '@/hooks/usePlaces';
+import { PlaceSubset } from '@/hooks/useCategoricalPlaces';
 import { Hero } from '@/components/Hero';
 
 const { height } = Dimensions.get('window');
@@ -27,7 +27,7 @@ const HEADER_HEIGHT = height * 0.4;
 const AnimatedFlashList = Animated.createAnimatedComponent(FlashList);
 
 const HomeContent: React.FC = () => {
-  const { categorizedPlaces, error, refetch } = usePlaces();
+  const { categorizedPlaces, error, refetch } = useCategoricalPlaces();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const router = useRouter();
   const scrollY = useSharedValue(0);
@@ -78,8 +78,6 @@ const HomeContent: React.FC = () => {
 
   return (
     <View className="flex-1 bg-zinc-900">
-
-
       <AnimatedFlashList
         data={categorizedPlaces}
         keyExtractor={(item: unknown, index: number) => {
