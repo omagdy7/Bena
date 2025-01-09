@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
 import TripStepCard from '@/components/TripStepCard';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
@@ -38,50 +38,60 @@ const TripTimeline = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchTrip = async () => {
-      try {
-        // Fetch the trip
-        const { data: tripData, error: tripError } = await supabase
-          .from('trips')
-          .select('*')
-          .eq('trip_id', id)
-          .single();
-        if (tripError) throw tripError;
-        // Fetch the steps for the trip
-        const { data: stepsData, error: stepsError } = await supabase
-          .from('tripstep')
-          .select('*')
-          .eq('trip_id', id)
-          .order('step_num', { ascending: true });
-        if (stepsError) throw stepsError;
-        // Fetch places for each step
-        const stepsWithPlaces = await Promise.all(
-          stepsData.map(async (step) => {
-            const { data: placeData, error: placeError } = await supabase
-              .from('places')
-              .select('*')
-              .eq('places_id', step.place_id)
-              .single();
-            if (placeError) throw placeError;
-            return {
-              ...step,
-              place: placeData,
-            };
-          })
-        );
-        // Construct the trip object
-        const constructedTrip = {
-          ...tripData,
-          steps: stepsWithPlaces,
-        };
-        setTrip(constructedTrip);
-      } catch (error) {
-        console.error('Error fetching trip:', error);
-      }
-    };
+  const handleEditStep = (stepId: string) => {
+    router.push({
+      pathname: '/editPlace',
+      params: { tripId: id, stepId }
+    });
+  };
+
+  const fetchTrip = async () => {
+    try {
+      // Fetch the trip
+      const { data: tripData, error: tripError } = await supabase
+        .from('trips')
+        .select('*')
+        .eq('trip_id', id)
+        .single();
+      if (tripError) throw tripError;
+      // Fetch the steps for the trip
+      const { data: stepsData, error: stepsError } = await supabase
+        .from('tripstep')
+        .select('*')
+        .eq('trip_id', id)
+        .order('step_num', { ascending: true });
+      if (stepsError) throw stepsError;
+      // Fetch places for each step
+      const stepsWithPlaces = await Promise.all(
+        stepsData.map(async (step) => {
+          const { data: placeData, error: placeError } = await supabase
+            .from('places')
+            .select('*')
+            .eq('places_id', step.place_id)
+            .single();
+          if (placeError) throw placeError;
+          return {
+            ...step,
+            place: placeData,
+          };
+        })
+      );
+      // Construct the trip object
+      const constructedTrip = {
+        ...tripData,
+        steps: stepsWithPlaces,
+      };
+      setTrip(constructedTrip);
+    } catch (error) {
+      console.error('Error fetching trip:', error);
+    }
+  };
+  fetchTrip();
+
+
+  useFocusEffect(() => {
     fetchTrip();
-  }, [id]);
+  });
 
   if (!trip) return <Text>Loading...</Text>;
 
@@ -120,7 +130,7 @@ const TripTimeline = () => {
                 <TripStepCard
                   step={step}
                   index={index}
-                  onEdit={() => console.log('Edit step:', step.step_id)}
+                  onEdit={() => handleEditStep(step.step_id)}
                 />
               </View>
             ))}
