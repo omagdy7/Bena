@@ -200,7 +200,7 @@ const CreateTrip: React.FC = () => {
           ))}
           <TouchableOpacity
             className="bg-zinc-800 p-4 rounded-lg items-center mb-4"
-            onPress={addStep}
+            onPress={() => { router.push('/choosePlace') }}
           >
             <Ionicons name="add-circle-outline" size={24} color="white" />
             <Text className="text-white mt-2">Add Step</Text>

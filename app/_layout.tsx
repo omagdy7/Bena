@@ -193,6 +193,15 @@ export default function RootLayout() {
             <Stack.Screen name="settings" options={{ headerShown: false }} />
             <Stack.Screen name="home/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="trips/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="choosePlace"
+              options={{
+                headerShown: false,
+                presentation: 'modal',
+                // This ensures it behaves like a modal and returns to previous screen
+                gestureEnabled: true,
+                gestureDirection: 'vertical'
+              }}
+            />
           </Stack>
         </AuthProvider>
       </ThemeProvider>
