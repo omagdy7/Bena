@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, RefreshControl, Dimensions } from 'react-native';
+import { View, RefreshControl, Dimensions, Image } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { useCategoricalPlaces } from '@/hooks/useCategoricalPlaces';
 import { useRouter } from 'expo-router';
@@ -32,6 +32,9 @@ const HomeContent: React.FC = () => {
   const router = useRouter();
   const scrollY = useSharedValue(0);
 
+  
+  
+
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     await refetch();
@@ -42,6 +45,11 @@ const HomeContent: React.FC = () => {
     router.push(`/home/${placeId}`);
   };
 
+  const handleSearchPress = () => {
+    router.push('../search'); // Navigate to the new search screen
+  };
+
+
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
@@ -49,17 +57,18 @@ const HomeContent: React.FC = () => {
   });
 
   const headerAnimatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
+    const backgroundOpacity = interpolate(
       scrollY.value,
       [0, HEADER_HEIGHT / 2],
-      [0, 1],
+      [0, 1], // Adjusts the alpha from 0 to 1
       Extrapolate.CLAMP
     );
-
+  
     return {
-      opacity,
+      backgroundColor: `rgba(17, 17, 17, ${backgroundOpacity})`, 
     };
   });
+  
 
   if (error) {
     return (
@@ -71,12 +80,13 @@ const HomeContent: React.FC = () => {
 
   const renderListHeader = () => (
     <>
-      <Hero />
+      <Hero/>
       <RecommendationCarousel />
     </>
   );
 
   return (
+    
     <View className="flex-1 bg-zinc-900">
       <AnimatedFlashList
         data={categorizedPlaces}
@@ -120,15 +130,40 @@ const HomeContent: React.FC = () => {
       />
 
       <Animated.View
-        className="absolute top-12 left-4 right-4 flex-row justify-between items-center"
+        className="absolute top-0 left-0 right-0 flex-row justify-between items-center bg-zinc-900 z-10 pt-14"
         style={headerAnimatedStyle}
-      >
-        <BlurView intensity={80} className="rounded-full p-2">
-          <Ionicons name="menu" size={24} color="white" />
-        </BlurView>
-        <BlurView intensity={80} className="rounded-full p-2">
-          <Ionicons name="search" size={24} color="white" />
-        </BlurView>
+      > 
+          
+        
+        <View className="flex-row items-center px-4">
+            <Image
+              source={require('../../assets/images/logo-wide.png')} // Corrected logo path
+              style={{width: 70, height: 35 }}
+              resizeMode="contain"
+            />
+          </View> 
+         <View className="flex-row tems-center">
+          <BlurView intensity={0} className="rounded-full p-4"  onTouchEnd={handleSearchPress} >
+            <Ionicons name="search" size={24} color="white" />
+          </BlurView>
+          <BlurView
+              intensity={0}
+              className="rounded-full p-4"
+              onTouchEnd={() => router.push('/account')}
+              style={{ alignSelf: 'flex-end' }} 
+            >
+              <Ionicons name="chatbox-ellipses-outline" size={24} color="white" />
+          </BlurView>
+          <BlurView
+              intensity={0}
+              className="rounded-full p-4"
+              onTouchEnd={() => router.push('/account')}
+              style={{ alignSelf: 'flex-end' }} 
+            >
+              <Ionicons name="person-circle-outline" size={24} color="#fcbf49" />
+          </BlurView>
+          </View> 
+        
       </Animated.View>
     </View>
   );
