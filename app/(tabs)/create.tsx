@@ -30,6 +30,7 @@ const CreateTrip: React.FC = () => {
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
   const [loading, setLoading] = useState(false);  // New state to track loading status
   const [isEmptyFields, setIsEmptyFields] = useState(false);  // New state to track loading status
+  const [selectedPlaces, setSelectedPlaces] = useState([]); // State to track selected places for swapping
 
 
 
@@ -122,7 +123,7 @@ const CreateTrip: React.FC = () => {
       // Insert each step into the 'trip_step' table
       const stepsData = steps.map((step, index) => ({
         trip_id: trip.trip_id,
-        step_num: step.step_num,
+        step_num: index + 1,
         place_id: step.place_id,
         start_time: step.start_time.toISOString(),
         end_time: step.end_time.toISOString(),
@@ -164,6 +165,28 @@ const CreateTrip: React.FC = () => {
 
   const tripDuration = getTripDuration(startDate, endDate);
 
+  const handleSelectPlace = (index) => {
+    if (selectedPlaces.includes(index)) {
+      setSelectedPlaces((prev) => prev.filter((i) => i !== index)); // Deselect if already selected
+    } else if (selectedPlaces.length < 2) {
+      setSelectedPlaces((prev) => [...prev, index]); // Add to selected list
+    }
+  
+    // If two places are selected, perform the swap
+    if (selectedPlaces.length === 1) {
+      const [firstIndex, secondIndex] = [...selectedPlaces, index];
+      swapPlaces(firstIndex, secondIndex);
+      setSelectedPlaces([]); // Reset selection after swap
+    }
+  };
+  
+  const swapPlaces = (index1, index2) => {
+    setSteps((prevSteps) => {
+      const updatedSteps = [...prevSteps];
+      [updatedSteps[index1], updatedSteps[index2]] = [updatedSteps[index2], updatedSteps[index1]];
+      return updatedSteps;
+    });
+  };
 
 
 
@@ -256,7 +279,14 @@ const CreateTrip: React.FC = () => {
 
       {/* Trip Steps */}
       <Animated.View entering={FadeInDown.delay(600).duration(500).springify()}>
-        <Text className="text-white text-lg mb-2">Trip Steps {steps.length === 0 ? isEmptyFields ? <Text className="text-red-400 font-bold">* please add places to the trip </Text> : "" : ""}</Text>
+        <Text className="text-white text-lg mb-2">
+          Trip Steps
+          {steps.length === 0
+            ? isEmptyFields
+              ? <Text className="text-red-400 font-bold">* please add places to the trip </Text>
+              : ""
+            : ""}
+        </Text>
         {steps.map((step, index) => (
           <Animated.View
             key={index}
@@ -300,6 +330,16 @@ const CreateTrip: React.FC = () => {
                 <Text className="text-white">End: {step.end_time?.toLocaleTimeString()}</Text>
               </TouchableOpacity>
             </View>
+            <TouchableOpacity
+              className={`bg-zinc-700 px-3 py-1 rounded-md ${selectedPlaces.includes(index) ? "border-2 border-yellow-400 bg-[#fcbf49]" : ""}`}
+              onPress={() => handleSelectPlace(index)}
+            >
+              
+              <Text className="text-white text-center py-1" style={{color: selectedPlaces.includes(index) ? "#000000" : "#ffffff"}}>
+              <Ionicons name={selectedPlaces.includes(index) ? "checkbox" : "swap-vertical-outline"} /> {' '}
+                {selectedPlaces.includes(index) ? "Swap" : "Swap"}
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
         ))}
         <TouchableOpacity
