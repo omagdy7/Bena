@@ -27,6 +27,7 @@ const CreateTrip: React.FC = () => {
   const [showStepStartTimePicker, setShowStepStartTimePicker] = useState(false);
   const [showStepEndTimePicker, setShowStepEndTimePicker] = useState(false);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
+  const [successMessageVisible, setSuccessMessageVisible] = useState(false);
 
   useEffect(() => {
     if (params.selectedPlaces) {
@@ -85,12 +86,12 @@ const CreateTrip: React.FC = () => {
     const tripData = {
       title,
       description,
-      "user_id": user?.id,
+      user_id: user?.id,
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
-      "status": 'in_progress'
+      status: 'in_progress',
     };
-
+  
     try {
       // Insert the trip into the 'trip' table
       const { data: trip, error: tripError } = await supabase
@@ -98,9 +99,9 @@ const CreateTrip: React.FC = () => {
         .insert([tripData])
         .select('trip_id')
         .single();
-
+  
       if (tripError) throw tripError;
-
+  
       // Insert each step into the 'trip_step' table
       const stepsData = steps.map((step, index) => ({
         trip_id: trip.trip_id,
@@ -110,19 +111,29 @@ const CreateTrip: React.FC = () => {
         end_time: step.end_time.toISOString(),
         status: index === 0 ? 'in_progress' : 'pending', // First step is 'in_progress', others are 'pending'
       }));
-
-      const { error: stepsError } = await supabase
-        .from('tripstep')
-        .insert(stepsData);
-
+  
+      const { error: stepsError } = await supabase.from('tripstep').insert(stepsData);
+  
       if (stepsError) throw stepsError;
-
+  
       console.log('Trip created successfully:', trip);
-      router.push(`/trips/${trip.trip_id}`);
+  
+      // Reset inputs after successful creation
+      setTitle('');
+      setDescription('');
+      setStartDate(new Date());
+      setEndDate(new Date());
+      setSteps([]);
+  
+      // Show success message
+      setSuccessMessageVisible(true);
+      setTimeout(() => setSuccessMessageVisible(false), 3000); // Hide after 3 seconds
     } catch (error) {
       console.error('Error creating trip:', error);
+      alert('An error occurred while creating the trip. Please try again.');
     }
   };
+  
 
 
 
@@ -134,12 +145,24 @@ const CreateTrip: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-zinc-900">
+    <SafeAreaView className="flex-1 bg-zinc-900 box" style={{ paddingBottom: 80 }}>
       <StatusBar style="light" />
       <ScrollView className="flex-1 px-6 pt-6">
-        <Animated.View entering={FadeInDown.duration(500).springify()}>
-          <Text className="text-3xl font-bold text-white mb-8">Create Your Trip</Text>
-        </Animated.View>
+      <Animated.View
+        entering={FadeInDown.duration(500).springify()}
+        className="flex-row justify-between items-center mb-8"
+      >
+        <Text className="text-2xl font-bold text-white flex-shrink" style={{color: successMessageVisible ? "#fcbf49" : "#ffffff"}}>
+            {successMessageVisible ? "Trip Created Successfully!" : "Create Your Trip"}
+          </Text>
+        <TouchableOpacity
+          onPress={handleGenerateAITrip}
+          className="flex-row items-center bg-gray-700 px-3 py-2 rounded-md"
+        >
+        <Ionicons name="bulb-outline" size={16} color="white" className="mr-2" />
+        <Text className="text-white text-sm">Generate AI Trip</Text>
+      </TouchableOpacity>
+    </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(100).duration(500).springify()}>
           <Text className="text-white text-lg mb-2">Trip Title</Text>
@@ -165,27 +188,30 @@ const CreateTrip: React.FC = () => {
           />
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(300).duration(500).springify()}>
-          <Text className="text-white text-lg mb-2">Start Date</Text>
-          <TouchableOpacity
-            className="bg-zinc-800 px-4 py-3 rounded-lg mb-6 flex-row justify-between items-center"
-            onPress={() => setShowStartDatePicker(true)}
-          >
-            <Text className="text-white">{startDate.toDateString()}</Text>
-            <Ionicons name="calendar-outline" size={24} color="white" />
-          </TouchableOpacity>
-        </Animated.View>
+        <Animated.View entering={FadeInDown.delay(300).duration(500).springify()} className="flex-row justify-between mb-6">
+  <View className="flex-1 mr-4">
+    <Text className="text-white text-lg mb-2">Start Date</Text>
+    <TouchableOpacity
+      className="bg-zinc-800 px-4 py-3 rounded-lg flex-row justify-between items-center"
+      onPress={() => setShowStartDatePicker(true)}
+    >
+      <Text className="text-white">{startDate.toDateString()}</Text>
+      <Ionicons name="calendar-outline" size={24} color="white" />
+    </TouchableOpacity>
+  </View>
 
-        <Animated.View entering={FadeInDown.delay(400).duration(500).springify()}>
-          <Text className="text-white text-lg mb-2">End Date</Text>
-          <TouchableOpacity
-            className="bg-zinc-800 px-4 py-3 rounded-lg mb-6 flex-row justify-between items-center"
-            onPress={() => setShowEndDatePicker(true)}
-          >
-            <Text className="text-white">{endDate.toDateString()}</Text>
-            <Ionicons name="calendar-outline" size={24} color="white" />
-          </TouchableOpacity>
-        </Animated.View>
+  <View className="flex-1">
+    <Text className="text-white text-lg mb-2">End Date</Text>
+    <TouchableOpacity
+      className="bg-zinc-800 px-4 py-3 rounded-lg flex-row justify-between items-center"
+      onPress={() => setShowEndDatePicker(true)}
+    >
+      <Text className="text-white">{endDate.toDateString()}</Text>
+      <Ionicons name="calendar-outline" size={24} color="white" />
+    </TouchableOpacity>
+  </View>
+</Animated.View>
+
 
         <Animated.View entering={FadeInDown.delay(600).duration(500).springify()}>
           <Text className="text-white text-lg mb-2">Trip Steps</Text>
@@ -243,22 +269,17 @@ const CreateTrip: React.FC = () => {
           </TouchableOpacity>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(700).duration(500).springify()}>
-          <CustomButton
-            title="Generate Trip with AI"
-            handlePress={handleGenerateAITrip}
-            icon="bulb-outline"
-            containerStyles="mb-8"
-          />
-        </Animated.View>
+        
       </ScrollView>
 
       <BlurView intensity={10} className="p-4">
-        <CustomButton
-          title="Create Trip"
-          handlePress={handleCreateTrip}
-          icon="airplane-outline"
-        />
+        <TouchableOpacity
+          onPress={handleCreateTrip}
+          className="flex-row items-center justify-center bg-zinc-700 px-4 py-3 rounded-md"
+        >
+          <Ionicons name="airplane-outline" size={18} color="white" className="mr-2" />
+          <Text className="text-white text-sm font-medium">Create Trip</Text>
+        </TouchableOpacity>
       </BlurView>
 
       {(showStartDatePicker || showEndDatePicker || showStepStartTimePicker || showStepEndTimePicker) && (

@@ -17,7 +17,7 @@ const tabScreens = [
 
 const TabsLayout = () => {
   const [hideBlurView, setHideBlurView] = useState(false);
-  const hideScreens = ['create', 'trip']
+  const hideScreens = [/*'create', 'trip'*/]
 
   useFocusEffect(
     useCallback(() => {
@@ -32,7 +32,7 @@ const TabsLayout = () => {
         screenOptions={{
           tabBarShowLabel: false,
           tabBarActiveTintColor: '#fcbf49',
-          tabBarInactiveTintColor: '#CDCDE0',
+          tabBarInactiveTintColor: '#777777',
           tabBarStyle: {
             position: 'absolute',
             bottom: 20,
@@ -73,14 +73,15 @@ const TabsLayout = () => {
               ),
               tabBarStyle: hideScreens.includes(name) ? { display: 'none' } : {
                 position: 'absolute',
-                bottom: 20,
+                bottom: 0,
                 left: 20,
                 right: 20,
-                elevation: 50,
+                elevation: 10,
                 backgroundColor: 'transparent',
                 borderTopWidth: 0,
-                height: 60,
+                height: 80,
                 zIndex: 1,
+                paddingTop: 20,
               },
             }}
           />
@@ -93,16 +94,16 @@ const TabsLayout = () => {
           tint="light"
           style={{
             position: 'absolute',
-            bottom: 20,
-            left: 20,
-            right: 20,
-            height: 75,
-            borderRadius: 15,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 80,
+            borderRadius: 0,
             overflow: 'hidden',
             zIndex: 0,
           }}
         >
-          <View style={{ flex: 1, backgroundColor: 'rgba(12, 12, 12, 0.90)' }} />
+          <View style={{ flex: 1, backgroundColor: 'rgba(12, 12, 12, 0.98)' }} />
         </BlurView>
       )}
 
