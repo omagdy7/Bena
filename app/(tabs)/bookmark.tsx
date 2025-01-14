@@ -68,7 +68,7 @@ const BookmarkScreen = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-zinc-900">
+    <SafeAreaView className="flex-1 bg-zinc-900" style={{ paddingBottom: 40 }}>
       <StatusBar style="light" />
       <Animated.View
         entering={FadeInDown.duration(500)}
