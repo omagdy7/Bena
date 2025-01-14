@@ -14,7 +14,7 @@ export default function RecommendationCarousel() {
   };
 
   if (loading) {
-    // return <RecommendationSkeleton />;
+    return <View className="p-4"></View> //<RecommendationSkeleton />;
   }
 
   if (error) {
