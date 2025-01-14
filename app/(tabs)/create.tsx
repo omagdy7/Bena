@@ -29,6 +29,8 @@ const CreateTrip: React.FC = () => {
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
   const [loading, setLoading] = useState(false);  // New state to track loading status
+  const [isEmptyFields, setIsEmptyFields] = useState(false);  // New state to track loading status
+
 
 
   useEffect(() => {
@@ -93,6 +95,10 @@ const CreateTrip: React.FC = () => {
 
 
   const handleCreateTrip = async () => {
+    if (steps.length === 0) {
+      setIsEmptyFields(true);
+      return;
+    }
     setLoading(true);
     const tripData = {
       title,
@@ -135,6 +141,8 @@ const CreateTrip: React.FC = () => {
       setStartDate(new Date());
       setEndDate(new Date());
       setSteps([]);
+      // set the isEmptyFields to false
+      setIsEmptyFields(false);
   
       // Show success message
       setSuccessMessageVisible(true);
@@ -183,32 +191,33 @@ const CreateTrip: React.FC = () => {
         <Text className="text-white text-sm">Generate AI Trip</Text>
       </TouchableOpacity>
     </Animated.View>
+      
+      {/* Trip Title and Description */}
+      <Animated.View entering={FadeInDown.delay(100).duration(500).springify()}>
+        <Text className="text-white text-lg mb-2">Trip Title</Text>
+        <TextInput
+          className="bg-zinc-800 text-white px-4 py-3 rounded-lg mb-6"
+          placeholder="Enter trip title"
+          placeholderTextColor="#a1a1aa"
+          value={title}
+          onChangeText={setTitle}
+        />
+      </Animated.View>
+      <Animated.View entering={FadeInDown.delay(200).duration(500).springify()}>
+        <Text className="text-white text-lg mb-2">Description</Text>
+        <TextInput
+          className="bg-zinc-800 text-white px-4 py-3 rounded-lg mb-6"
+          placeholder="Enter trip description"
+          placeholderTextColor="#a1a1aa"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          numberOfLines={4}
+        />
+      </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(100).duration(500).springify()}>
-          <Text className="text-white text-lg mb-2">Trip Title</Text>
-          <TextInput
-            className="bg-zinc-800 text-white px-4 py-3 rounded-lg mb-6"
-            placeholder="Enter trip title"
-            placeholderTextColor="#a1a1aa"
-            value={title}
-            onChangeText={setTitle}
-          />
-        </Animated.View>
-
-        <Animated.View entering={FadeInDown.delay(200).duration(500).springify()}>
-          <Text className="text-white text-lg mb-2">Description</Text>
-          <TextInput
-            className="bg-zinc-800 text-white px-4 py-3 rounded-lg mb-6"
-            placeholder="Enter trip description"
-            placeholderTextColor="#a1a1aa"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-          />
-        </Animated.View>
-
-        <Animated.View entering={FadeInDown.delay(300).duration(500).springify()} className="flex-row justify-between mb-6">
+      {/* Start Date and End Date */}
+      <Animated.View entering={FadeInDown.delay(300).duration(500).springify()} className="flex-row justify-between mb-6">
         <View className="flex-1 mr-4">
           <Text className="text-white text-lg mb-2">Start Date</Text>
           <TouchableOpacity
@@ -224,12 +233,12 @@ const CreateTrip: React.FC = () => {
         <Text className="text-white text-lg mb-2">
           End Date {' '}
           {tripDuration === 0 ? (
-            <Text className="text-green-400 font-bold">
-            ( same day )
+            <Text className="text-gray-400 font-bold">
+             same day 
           </Text>
           ) : (
-            <Text className="text-yellow-400 font-semibold">
-              ( {tripDuration} days )
+            <Text className="text-gray-400 font-semibold">
+              takes {tripDuration} days
             </Text>
           )}
           {' '}
@@ -245,61 +254,62 @@ const CreateTrip: React.FC = () => {
         
       </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(600).duration(500).springify()}>
-          <Text className="text-white text-lg mb-2">Trip Steps</Text>
-          {steps.map((step, index) => (
-            <Animated.View
-              key={index}
-              entering={FadeInRight.duration(300)}
-              exiting={FadeOutRight.duration(300)}
-              className="bg-zinc-800 p-4 rounded-lg mb-4"
-            >
-              <View className="flex-row justify-between items-center mb-2">
-                <Text className="text-white font-semibold">Step {step.step_num}</Text>
-                <TouchableOpacity onPress={() => removeStep(index)}>
-                  <Ionicons name="close-circle-outline" size={24} color="white" />
-                </TouchableOpacity>
-              </View>
-              {step.place && (
-                <View className="mb-2">
-                  <Image
-                    source={{ uri: step.place.image }}
-                    className="w-full h-32 rounded-lg mb-2"
-                    resizeMode="cover"
-                  />
-                  <Text className="text-white font-semibold">{step.place.name}</Text>
-                </View>
-              )}
-              <View className="flex-row justify-between mb-2">
-                <TouchableOpacity
-                  className="bg-zinc-700 px-3 py-2 rounded-md flex-1 mr-2"
-                  onPress={() => {
-                    setActiveStepIndex(index);
-                    setShowStepStartTimePicker(true);
-                  }}
-                >
-                  <Text className="text-white">Start: {step.start_time?.toLocaleTimeString()}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="bg-zinc-700 px-3 py-2 rounded-md flex-1 ml-2"
-                  onPress={() => {
-                    setActiveStepIndex(index);
-                    setShowStepEndTimePicker(true);
-                  }}
-                >
-                  <Text className="text-white">End: {step.end_time?.toLocaleTimeString()}</Text>
-                </TouchableOpacity>
-              </View>
-            </Animated.View>
-          ))}
-          <TouchableOpacity
-            className="bg-zinc-800 p-4 rounded-lg items-center mb-4"
-            onPress={addSteps}
+      {/* Trip Steps */}
+      <Animated.View entering={FadeInDown.delay(600).duration(500).springify()}>
+        <Text className="text-white text-lg mb-2">Trip Steps {steps.length === 0 ? isEmptyFields ? <Text className="text-red-400 font-bold">* please add places to the trip </Text> : "" : ""}</Text>
+        {steps.map((step, index) => (
+          <Animated.View
+            key={index}
+            entering={FadeInRight.duration(300)}
+            exiting={FadeOutRight.duration(300)}
+            className="bg-zinc-800 p-4 rounded-lg mb-4"
           >
-            <Ionicons name="add-circle-outline" size={24} color="white" />
-            <Text className="text-white mt-2">Add Steps</Text>
-          </TouchableOpacity>
-        </Animated.View>
+            <View className="flex-row justify-between items-center mb-2">
+              <Text className="text-white font-semibold">Step {step.step_num}</Text>
+              <TouchableOpacity onPress={() => removeStep(index)}>
+                <Ionicons name="close-circle-outline" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+            {step.place && (
+              <View className="mb-2">
+                <Image
+                  source={{ uri: step.place.image }}
+                  className="w-full h-32 rounded-lg mb-2"
+                  resizeMode="cover"
+                />
+                <Text className="text-white font-semibold">{step.place.name}</Text>
+              </View>
+            )}
+            <View className="flex-row justify-between mb-2">
+              <TouchableOpacity
+                className="bg-zinc-700 px-3 py-2 rounded-md flex-1 mr-2"
+                onPress={() => {
+                  setActiveStepIndex(index);
+                  setShowStepStartTimePicker(true);
+                }}
+              >
+                <Text className="text-white">Start: {step.start_time?.toLocaleTimeString()}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="bg-zinc-700 px-3 py-2 rounded-md flex-1 ml-2"
+                onPress={() => {
+                  setActiveStepIndex(index);
+                  setShowStepEndTimePicker(true);
+                }}
+              >
+                <Text className="text-white">End: {step.end_time?.toLocaleTimeString()}</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        ))}
+        <TouchableOpacity
+          className="bg-zinc-800 p-4 rounded-lg items-center mb-4"
+          onPress={addSteps}
+        >
+          <Ionicons name="add-circle-outline" size={24} color="white" />
+          <Text className="text-white mt-2">Add Steps</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
         
       </ScrollView>
