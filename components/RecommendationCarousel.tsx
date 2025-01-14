@@ -14,15 +14,15 @@ export default function RecommendationCarousel() {
   };
 
   if (loading) {
-    return <RecommendationSkeleton />;
+    // return <RecommendationSkeleton />;
   }
 
   if (error) {
     return (
       <View className="p-4">
-        <Text className="text-red-500">
+        {/* <Text className="text-red-500">
           {error || 'Failed to load recommendations'}
-        </Text>
+        </Text> */}
       </View>
     );
   }
