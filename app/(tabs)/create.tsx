@@ -28,6 +28,8 @@ const CreateTrip: React.FC = () => {
   const [showStepEndTimePicker, setShowStepEndTimePicker] = useState(false);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [successMessageVisible, setSuccessMessageVisible] = useState(false);
+  const [loading, setLoading] = useState(false);  // New state to track loading status
+
 
   useEffect(() => {
     if (params.selectedPlaces) {
@@ -62,9 +64,17 @@ const CreateTrip: React.FC = () => {
     if (event.type === 'set' && selectedDate) {
       if (showStartDatePicker) {
         setStartDate(selectedDate);
+        if (selectedDate > endDate) {
+          setEndDate(selectedDate);  // Automatically update end date if it's before start date
+        }
         setShowStartDatePicker(false);
       } else if (showEndDatePicker) {
-        setEndDate(selectedDate);
+        if (selectedDate >= startDate) {
+          setEndDate(selectedDate);
+        } else {
+          // Handle case where end date is before start date
+          alert('End date cannot be before start date.');
+        }
         setShowEndDatePicker(false);
       } else if (showStepStartTimePicker) {
         updateStep(activeStepIndex, 'start_time', selectedDate);
@@ -83,6 +93,7 @@ const CreateTrip: React.FC = () => {
 
 
   const handleCreateTrip = async () => {
+    setLoading(true);
     const tripData = {
       title,
       description,
@@ -128,13 +139,22 @@ const CreateTrip: React.FC = () => {
       // Show success message
       setSuccessMessageVisible(true);
       setTimeout(() => setSuccessMessageVisible(false), 3000); // Hide after 3 seconds
+
     } catch (error) {
       console.error('Error creating trip:', error);
       alert('An error occurred while creating the trip. Please try again.');
+    } finally {
+      setLoading(false); // Set loading to false once the creation process is complete
     }
   };
   
+  // Calculate the trip duration in days
+  const getTripDuration = (start: Date, end: Date) => {
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    return Math.ceil(diffTime / (1000 * 3600 * 24)); // Convert milliseconds to days
+  };
 
+  const tripDuration = getTripDuration(startDate, endDate);
 
 
 
@@ -152,8 +172,8 @@ const CreateTrip: React.FC = () => {
         entering={FadeInDown.duration(500).springify()}
         className="flex-row justify-between items-center mb-8"
       >
-        <Text className="text-2xl font-bold text-white flex-shrink" style={{color: successMessageVisible ? "#fcbf49" : "#ffffff"}}>
-            {successMessageVisible ? "Trip Created Successfully!" : "Create Your Trip"}
+        <Text className="text-2xl font-bold text-white flex-shrink" style={{color:"white"}}>
+          Create Your Trip
           </Text>
         <TouchableOpacity
           onPress={handleGenerateAITrip}
@@ -189,29 +209,41 @@ const CreateTrip: React.FC = () => {
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(300).duration(500).springify()} className="flex-row justify-between mb-6">
-  <View className="flex-1 mr-4">
-    <Text className="text-white text-lg mb-2">Start Date</Text>
-    <TouchableOpacity
-      className="bg-zinc-800 px-4 py-3 rounded-lg flex-row justify-between items-center"
-      onPress={() => setShowStartDatePicker(true)}
-    >
-      <Text className="text-white">{startDate.toDateString()}</Text>
-      <Ionicons name="calendar-outline" size={24} color="white" />
-    </TouchableOpacity>
-  </View>
+        <View className="flex-1 mr-4">
+          <Text className="text-white text-lg mb-2">Start Date</Text>
+          <TouchableOpacity
+            className="bg-zinc-800 px-4 py-3 rounded-lg flex-row justify-between items-center"
+            onPress={() => setShowStartDatePicker(true)}
+          >
+            <Text className="text-white">{startDate.toDateString()}</Text>
+            <Ionicons name="calendar-outline" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
 
-  <View className="flex-1">
-    <Text className="text-white text-lg mb-2">End Date</Text>
-    <TouchableOpacity
-      className="bg-zinc-800 px-4 py-3 rounded-lg flex-row justify-between items-center"
-      onPress={() => setShowEndDatePicker(true)}
-    >
-      <Text className="text-white">{endDate.toDateString()}</Text>
-      <Ionicons name="calendar-outline" size={24} color="white" />
-    </TouchableOpacity>
-  </View>
-</Animated.View>
-
+        <View className="flex-1">
+        <Text className="text-white text-lg mb-2">
+          End Date {' '}
+          {tripDuration === 0 ? (
+            <Text className="text-green-400 font-bold">
+            ( same day )
+          </Text>
+          ) : (
+            <Text className="text-yellow-400 font-semibold">
+              ( {tripDuration} days )
+            </Text>
+          )}
+          {' '}
+      </Text>
+          <TouchableOpacity
+            className="bg-zinc-800 px-4 py-3 rounded-lg flex-row justify-between items-center"
+            onPress={() => setShowEndDatePicker(true)}
+          >
+            <Text className="text-white">{endDate.toDateString()}</Text>
+            <Ionicons name="calendar-outline" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+        
+      </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(600).duration(500).springify()}>
           <Text className="text-white text-lg mb-2">Trip Steps</Text>
@@ -272,13 +304,18 @@ const CreateTrip: React.FC = () => {
         
       </ScrollView>
 
+      {/* Creating Trip Button */}
+
       <BlurView intensity={10} className="p-4">
         <TouchableOpacity
           onPress={handleCreateTrip}
           className="flex-row items-center justify-center bg-zinc-700 px-4 py-3 rounded-md"
+          disabled={loading}  // Disable the button if loading is true
         >
-          <Ionicons name="airplane-outline" size={18} color="white" className="mr-2" />
-          <Text className="text-white text-sm font-medium">Create Trip</Text>
+          <Ionicons name={successMessageVisible ? "checkmark-circle-outline" : loading ? "refresh-outline" : "airplane-outline" } size={18} color={successMessageVisible ? "#fcbf49" : "#ffffff"} className="mr-2" />
+          <Text className="text-2xl font-bold text-white flex-shrink" style={{color: successMessageVisible ? "#fcbf49" : "#ffffff"}}>
+            {successMessageVisible ? "Trip Created Successfully!" : loading ? "Creating Trip..." : "Create Trip"}
+          </Text>
         </TouchableOpacity>
       </BlurView>
 

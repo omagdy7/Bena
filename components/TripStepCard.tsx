@@ -69,8 +69,8 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
 
           <View className="mb-3">
             <View className="flex-row justify-between mb-1">
-              <Text className="text-secondary">Start Time: {format(step.start_time, 'h:mm a')}</Text>
-              <Text className="text-secondary">End Time: {format(step.end_time, 'h:mm a')}</Text>
+              {/* <Text className="text-secondary">Start Time: {format(step.start_time, 'h:mm a')}</Text>
+              <Text className="text-secondary">End Time: {format(step.end_time, 'h:mm a')}</Text> */}
             </View>
             <ProgressBar progress={progress} index={index} />
           </View>
