@@ -53,6 +53,7 @@ const PlaceDetails: React.FC = () => {
 
     try {
       if (isBookmarked) {
+        setIsBookmarked(false);
         // Remove bookmark
         const { error } = await supabase
           .from('bookmarks')
@@ -61,8 +62,8 @@ const PlaceDetails: React.FC = () => {
           .eq('user_id', user.id);
 
         if (error) throw error;
-        setIsBookmarked(false);
       } else {
+        setIsBookmarked(true);
         // Add bookmark
         const { error } = await supabase
           .from('bookmarks')
@@ -73,7 +74,6 @@ const PlaceDetails: React.FC = () => {
           });
 
         if (error) throw error;
-        setIsBookmarked(true);
       }
     } catch (err) {
       console.error('Error toggling bookmark:', err);
