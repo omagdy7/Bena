@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { View, ScrollView, Text, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, ActivityIndicator, Dimensions, TouchableOpacity, Linking, Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { Place } from '@/db/schema';
 import { BlurView } from 'expo-blur';
@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import FastImage from 'react-native-fast-image';
 import { useAuth } from '@/context/AuthProvider';
+import MapView, { Marker } from 'react-native-maps';
 
 const { width } = Dimensions.get('window');
 
@@ -20,6 +21,12 @@ const PlaceDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [feedback, setFeedback] = useState<'up' | 'down' | 'expensive' | 'affordable' | 'exhausting' | 'relaxing' | null>(null);
+  const [isGoodFeedback, setIsGoodFeedback] = useState<'up' | 'down'| null>(null);
+  const [isCheap, setIsCheap] = useState<'expensive' | 'affordable' | null>(null);
+  const [isEasy, setIsEasy] = useState<'exhausting' | 'relaxing' | null>(null);
+
+
 
 
   // Check if place is bookmarked on component mount
@@ -81,6 +88,65 @@ const PlaceDetails: React.FC = () => {
     }
   }
 
+  const handleFeedbackUp = async () => {
+    setIsGoodFeedback('up');
+  };
+
+  const handleFeedbackDown = async () => {
+    setIsGoodFeedback('down');
+  };
+
+  const handleFeedbackExpensive = async () => {
+    setIsCheap('expensive');
+  };
+
+  const handleFeedbackAffordable = async () => {
+    setIsCheap('affordable');
+  };
+
+  const handleFeedbackRelaxing = async () => {
+    setIsEasy('relaxing');
+  };
+
+  const handleFeedbackExhausting = async () => {
+    setIsEasy('exhausting');
+  };
+
+  const handleClickOnLocation = async () => { 
+    Linking.openURL(place?.external_link!);
+  }
+
+  const handleClickOnGoogleMaps = async () => {
+    Linking.openURL(place?.external_link!);
+  }
+
+
+  const handleClickOnTiktok = async () => {
+    Linking.openURL(`https://www.google.com/search?q=site%3Atiktok.com+${place?.name}`);
+  };
+
+  const handleClickOnInstagram = async () => {
+    Linking.openURL(`https://www.google.com/search?q=site%3Ainstagram.com+${place?.name}`);
+
+  }
+
+  const handleClickOnTwitter = async () => {
+    Linking.openURL(`https://www.google.com/search?q=site%3Atwitter.com+${place?.name}`);
+  }
+
+  const handleClickOnPinterest = async () => {
+    Linking.openURL(`https://www.google.com/search?q=site%3Apinterest.com+${place?.name}`);
+  }
+
+  const handleClickOnYoutube = async () => {
+    Linking.openURL(`https://www.google.com/search?q=site%3Ayoutube.com+${place?.name}`);
+
+  }
+
+  const handleClickOnTripadvisor = async () => {
+    Linking.openURL(`https://www.google.com/search?q=site%3Atripadvisor.com+${place?.name}`);
+  }
+
 
   useEffect(() => {
     const fetchPlace = async () => {
@@ -133,36 +199,210 @@ const PlaceDetails: React.FC = () => {
           colors={['transparent', 'rgba(24, 24, 27, 0.8)', '#18181b']}
           style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 100 }}
         />
-        <BlurView intensity={20} style={{ position: 'absolute', top: 40, left: 20, right: 20, borderRadius: 20, overflow: 'hidden' }}>
+        <BlurView intensity={0} style={{ position: 'absolute', top: 40, left: 20, right: 20, borderRadius: 20, overflow: 'hidden' }}>
           <View className="flex-row justify-between items-center p-2">
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Ionicons name="arrow-back" size={24} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleBookmark}>
-              {
-                !isBookmarked ?
-                  <Ionicons name="heart-outline" size={24} color="#fff" />
-                  : <Ionicons name="heart" size={24} color="#EA0000" />
-              }
-            </TouchableOpacity>
           </View>
         </BlurView>
-      </View>
-      <Animated.View entering={FadeInUp.delay(300).duration(500)} className="p-6">
-        <Animated.Text entering={FadeInDown.delay(400).duration(500)} className="text-3xl font-bold text-white mb-2">{place?.name}</Animated.Text>
-        <Animated.View entering={FadeInDown.delay(500).duration(500)} className="flex-row items-center mb-4">
-          <Ionicons name="location-outline" size={16} color="#fcbf49" />
-          <Text className="text-gray-300 ml-1">{place?.location || 'Unknown Location'}</Text>
-        </Animated.View>
-        <Animated.Text entering={FadeInDown.delay(600).duration(500)} className="text-gray-300 text-base leading-6 mb-6">{place?.description}</Animated.Text>
-        <Animated.View entering={FadeInDown.delay(700).duration(500)} className="flex-row justify-between items-center bg-zinc-800 rounded-lg p-4">
-          <View>
-            <Text className="text-gray-400 text-sm">Price</Text>
-            <Text className="text-white text-lg font-bold">${place?.price || 'N/A'}</Text>
-          </View>
-          <TouchableOpacity className="bg-fcbf49 py-3 px-6 rounded-full">
-            <Text className="text-zinc-900 font-bold">Book Now</Text>
+        <TouchableOpacity onPress={handleBookmark} className= {`ml-2 absolute bottom-0 right-10 flex-row items-center p-4 rounded-xl drop-shadow-xl  ${!isBookmarked ? 'bg-zinc-800' : 'bg-zinc-800'}`}>
+          <Text className={`text-xl text-gray-300 mr-2 flex-col ${!isBookmarked ? 'text-white' : 'text-[#fcbf49]'}`}>{!isBookmarked ? 'Add to Bookmark' : 'Added to Bookmarkes'}</Text>
+            {
+              !isBookmarked ?
+                <Ionicons className="" name="bookmark-outline" size={25} color="#fff" />
+                : <Ionicons name="bookmark" size={25} color="#fcbf49" />
+            }
           </TouchableOpacity>
+      </View>
+      
+      <Animated.View entering={FadeInUp.delay(300).duration(500)} className="p-6">
+        <Animated.Text entering={FadeInDown.delay(400).duration(500)} className="text-4xl font-bold text-white width-full mb-2 flex-row justify-between items-center"><Text className="mr-4">{place?.name}</Text>
+        </Animated.Text>
+
+        <Animated.View entering={FadeInDown.delay(500).duration(500)} className="flex-row items-center mb-4 ">
+          <TouchableOpacity className="bg-zinc-800 py-1 px-2 mr-2 rounded-full flex-row items-center" onPress={handleClickOnLocation}> 
+            <Ionicons name="location-outline" size={14} color="#fcbf49" />
+            <Text className="text-gray-300 ml-1 " style={{fontSize: 12}}>{place?.city || 'Unknown Location'}</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity className="bg-zinc-800 py-1 px-2 mr-5 rounded-full flex-row items-center">
+          <Ionicons name="pricetag-outline" size={14} color="#fcbf49" />
+          <Text className="text-gray-300 ml-1" style={{fontSize: 12}}>{place?.category}</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        <Animated.Text entering={FadeInDown.delay(600).duration(500)} className="text-gray-300 text-base leading-6 mb-2 rounded-xl px-2 py-2 bg-zinc-800 ">{place?.description}</Animated.Text>
+        <Animated.View
+          entering={FadeInDown.delay(800).duration(500)}
+          className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 px-2 rounded-xl border-2 border-zinc-700"
+        >
+          <Text className="text-white text-xl font-bold mb-4 py-2 px-2" style={{ color: '#AAA' }}>Share Your Experience With The Place</Text>
+          <View className="flex-row justify-center items-center my-2">
+            <TouchableOpacity
+              style={{ width: 145 }}
+              onPress={handleFeedbackUp}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
+                isGoodFeedback === 'up' ? 'bg-blue-400' : 'bg-white'
+              }`}
+            >
+              <Text className={`mr-2 text-sm font-bold ${isGoodFeedback === 'up' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Amazing</Text>
+              <Ionicons
+                name={isGoodFeedback === 'up' ? 'thumbs-up' : 'thumbs-up-outline'}
+                size={18}
+                color={isGoodFeedback === 'up' ? '#18181b' : '#18181b'}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{ width: 145 }}
+              onPress={handleFeedbackDown}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
+                isGoodFeedback === 'down' ? 'bg-red-400' : 'bg-white'
+              }`}
+            >
+              
+              <Ionicons
+                name={isGoodFeedback === 'down' ? 'thumbs-down' : 'thumbs-down-outline'}
+                size={18}
+                color={isGoodFeedback === 'down' ? '#18181b' : '#18181b'}
+              />
+              <Text className={`ml-2 text-sm font-bold ${isGoodFeedback === 'down' ? 'text-zinc-900' : 'text-zinc-800'}`}>Below Expectations</Text>
+            </TouchableOpacity>
+          </View>
+
+
+          {/* Feedback for Place is Expensive */}
+          <View className="flex-row justify-center items-center my-2">
+            <TouchableOpacity
+            style={{ width: 145 }}
+              onPress={handleFeedbackAffordable}
+              className={`p-2 rounded-lg mx-4 flex-row items-center ${
+                isCheap === 'affordable' ? 'bg-orange-400' : 'bg-white'
+              }`}
+            >
+              <Text className={`mr-2 text-sm font-bold ${isCheap === 'affordable' ? 'text-zinc-900' : 'text-zinc-800'}`} >Cheaper than Expect</Text>
+              <Ionicons
+                name={isCheap === 'affordable' ? 'flame' : 'flame-outline'}
+                size={18}
+                color="#18181b"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{ width: 145 }}
+              onPress={handleFeedbackExpensive}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
+                isCheap === 'expensive' ? 'bg-yellow-400' : 'bg-white'
+              }`}
+            >
+              <Ionicons
+                name={isCheap === 'expensive' ? 'cash' : 'cash-outline'}
+                size={18}
+                color="#18181b"
+              />
+              <Text className={`ml-2 text-sm font-bold ${isCheap === 'expensive' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Expensive</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Feedback for Place is Exhausting */}
+          <View className="flex-row justify-center items-center my-2">
+              
+            <TouchableOpacity
+              style={{ width: 145 }}
+              onPress={handleFeedbackRelaxing}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
+                isEasy === 'relaxing' ? 'bg-green-400' : 'bg-white'
+              }`}
+            >
+              
+              <Text className={`mr-2 text-sm font-bold ${isEasy === 'relaxing' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Relaxing</Text>
+              <Ionicons
+                name={isEasy === 'relaxing' ? 'leaf' : 'leaf-outline'}
+                size={18}
+                color="#18181b"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{ width: 145 }}
+              onPress={handleFeedbackExhausting}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
+                isEasy === 'exhausting' ? 'bg-gray-400' : 'bg-white'
+              }`}
+            >
+              <Ionicons
+                name={isEasy === 'exhausting' ? 'battery-dead' : 'battery-dead-outline'}
+                size={18}
+                color="#18181b"
+              />
+              <Text className={`ml-2 text-sm font-bold ${isEasy === 'exhausting' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Exhausting</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+
+        {/* Explore More */}
+        <Animated.View
+          entering={FadeInDown.delay(800).duration(500)}
+          className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 px-2 rounded-xl border-2 border-zinc-900 shadow-lg"
+        >
+          <Text className="text-white text-xl font-bold mb-4 py-2 px-2" style={{ color: '#AAA' }}>Explore More About The Place</Text>
+          
+          <View className="flex-row justify-center items-center my-2">
+
+            <TouchableOpacity
+              style={{ width: 145 }}
+              onPress={handleClickOnTiktok}
+              className="p-2 rounded-lg mx-4 flex-row items-center justify-center bg-black">
+              <Ionicons
+                name="logo-tiktok"
+                size={18}
+                color="white"
+              />
+              <Text className="ml-2 text-sm font-bold text-white">Explore on TikTok</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={{ width: 145 }}
+              onPress={handleClickOnYoutube}
+              className="p-2 rounded-lg mx-4 flex-row items-center justify-center bg-red-600">
+              <Ionicons
+                name="logo-youtube"
+                size={18}
+                color="white"
+              />
+              <Text className="ml-2 text-sm font-bold text-white">Explore on YouTube</Text>
+            </TouchableOpacity>
+
+            
+          </View>
+          <View className="flex-row justify-center items-center my-2">
+
+          <TouchableOpacity
+              style={{ width: 145 }}
+              onPress={handleClickOnInstagram}
+              className="p-2 rounded-lg mx-4 flex-row items-center justify-center bg-pink-600">
+              <Ionicons
+                name="logo-instagram"
+                size={18}
+                color="white"
+              />
+              <Text className="ml-2 text-sm font-bold text-white">Explore on Instagram</Text>
+            </TouchableOpacity>
+            
+          <TouchableOpacity
+             style={{ width: 145 }}
+              onPress={handleClickOnPinterest}
+              className="p-2 rounded-lg mx-4 flex-row items-center justify-center bg-red-400">
+              <Ionicons
+                name="logo-pinterest"
+                size={18}
+                color="white"
+              />
+              <Text className="ml-2 text-sm font-bold text-white">Explore on Pinterest</Text>
+            </TouchableOpacity>
+          </View>
+
         </Animated.View>
       </Animated.View>
     </ScrollView>

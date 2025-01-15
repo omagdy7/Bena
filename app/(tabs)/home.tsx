@@ -20,6 +20,7 @@ import HomeSkeleton from '@/components/HomeSkeleton';
 import RecommendationCarousel from '@/components/RecommendationCarousel';
 import { PlaceSubset } from '@/hooks/useCategoricalPlaces';
 import { Hero } from '@/components/Hero';
+import { StatusBar } from 'expo-status-bar';
 
 const { height } = Dimensions.get('window');
 const HEADER_HEIGHT = height * 0.4;
@@ -88,6 +89,7 @@ const HomeContent: React.FC = () => {
   return (
     
     <View className="flex-1 bg-zinc-900">
+      <StatusBar style="light" />
       <AnimatedFlashList
         data={categorizedPlaces}
         keyExtractor={(item: unknown, index: number) => {
