@@ -425,6 +425,7 @@ const PlaceDetails: React.FC = () => {
           </View>
 
         </Animated.View>
+        {/* todo add nearby places and show first places in use's bookmark */}
       </Animated.View>
     </ScrollView>
   );
