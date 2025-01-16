@@ -127,7 +127,7 @@ const CreateTrip: React.FC = () => {
         place_id: step.place_id,
         start_time: step.start_time.toISOString(),
         end_time: step.end_time.toISOString(),
-        status: index === 0 ? 'in_progress' : 'pending', // First step is 'in_progress', others are 'pending'
+        status: 'pending', // First step is 'in_progress', others are 'pending'
       }));
   
       const { error: stepsError } = await supabase.from('tripstep').insert(stepsData);

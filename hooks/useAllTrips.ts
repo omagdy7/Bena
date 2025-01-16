@@ -162,6 +162,47 @@ const useAllTrips = () => {
     return data;
   };
 
+  const deleteStep = async (stepId) => {
+    const { data, error } = await supabase
+      .from('tripstep')
+      .delete()
+      .eq('step_id', stepId);
+
+    if (error) throw error;
+    await refetch();
+    return data;
+  };
+
+  const getSteoNum = async (stepId) => {
+    const { data, error } = await supabase
+      .from('tripstep')
+      .select('step_num')
+      .eq('step_id', stepId);
+
+    if (error) throw error;
+    return data[0].step_num;
+  };
+  const swapSteps = async (stepId1: string, stepId2: string) => {
+    console.log('Swapping steps:', stepId1, stepId2);
+    
+    const step1 = await getSteoNum(stepId1);
+    const step2 = await getSteoNum(stepId2);
+
+    const { data, error } = await supabase
+      .from('tripstep')
+      .update({ step_num: step2 })  // Update the status to 'visited'
+      .eq('step_id', stepId1);
+
+    const { data: data2, error: error2 } = await supabase
+      .from('tripstep')
+      .update({ step_num: step1 })  // Update the status to 'visited'
+      .eq('step_id', stepId2);
+
+    if (error) throw error;
+    await refetch();
+    return data;
+  };
+
 
   const {
     data,
@@ -189,6 +230,8 @@ const useAllTrips = () => {
     isSyncing,
     markAsVisited,
     markAsPending,
+    deleteStep,
+    swapSteps,
   };
 };
 
