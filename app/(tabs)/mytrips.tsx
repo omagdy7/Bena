@@ -12,7 +12,7 @@ import { format } from 'date-fns';
 import useAllTrips from '@/hooks/useAllTrips';
 import { supabase } from '@/lib/supabase';
 
-const TripCard = ({ trip, index,  }) => {
+const TripCard = ({ trip, index , setSyncing  }) => {
     const { refetch, markAsInProgress, markAsPlanned, markAsCompleted, deleteTrip } = useAllTrips(); // useAllTrips hook
     const [ status, setStatus ] = useState<'in_progress' | 'planned' | 'completed'>(trip.status);
     const [ deleted, setDeleted ] = useState<boolean>(false);
@@ -24,29 +24,36 @@ const TripCard = ({ trip, index,  }) => {
 
   const afterAction = async () => {
     await refetch();
+    setUpdated(false);
+    setSyncing(false);
   };
 
-  const handleSwitchToInProgress = async () => {
-    setStatus('in_progress');
+  const beforeAction = async () => {
+    setSyncing(true);
     setUpdated(true);
+  }
+
+  const handleSwitchToInProgress = async () => {
+    await beforeAction();
+    setStatus('in_progress');
     await markAsInProgress(trip.trip_id);
     await afterAction();
-    setUpdated(false);
+    
 
   };
 
   const handleSwitchToCompleted = async () => {
+    await beforeAction();
     setStatus('completed');
     await markAsCompleted(trip.trip_id);
     await afterAction();
   };
 
   const handleSwitchToPlanned = async () => {
-    setUpdated(true);
+    await beforeAction();
     setStatus('planned');
     await markAsPlanned(trip.trip_id);
     await afterAction();
-    setUpdated(false);
   };
 
   const handleDeleteTrip = async () => {
@@ -59,6 +66,7 @@ const TripCard = ({ trip, index,  }) => {
             text: 'Delete',
             style: 'destructive',
             onPress: async () => {
+                await beforeAction(); 
                 setDeleted(true);
                 await deleteTrip(trip.trip_id);
                 await afterAction();
@@ -273,7 +281,7 @@ const AllTrips = () => {
           <FlatList
             data={trips}
             keyExtractor={(item) => item.trip_id}
-            renderItem={({ item, index }) => <TripCard trip={item} index={index} />}
+            renderItem={({ item, index  }) => <TripCard trip={item} index={index}  setSyncing={setSyncing} />}
             showsVerticalScrollIndicator={false}
             refreshing={refreshing}
             onRefresh={handleRefresh}

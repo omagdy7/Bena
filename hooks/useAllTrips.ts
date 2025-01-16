@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 const useAllTrips = () => {
   const user = useAuthCheck();
+  const [ isSyncing, setIsSyncing ] = useState(false);
 
 
   const fetchAllTrips = async () => {
@@ -80,8 +81,7 @@ const useAllTrips = () => {
   
   // Mark a trip as 'in progress'
   const markAsInProgress = async (tripId) => {
-     // make sure this is only in_progress in all trips
-
+    setIsSyncing(true);
      // Step 1: Update all trips for the user with status 'in_progress' to 'planned'
     const { error: resetError } = await supabase
     .from('trips')
@@ -98,6 +98,8 @@ const useAllTrips = () => {
       .eq('trip_id', tripId);
 
     if (error) throw error;
+
+    setIsSyncing(false);
 
     return data;
   };
@@ -161,6 +163,7 @@ const useAllTrips = () => {
     markAsCompleted,
     markAsPlanned,
     deleteTrip,
+    isSyncing,
   };
 };
 
