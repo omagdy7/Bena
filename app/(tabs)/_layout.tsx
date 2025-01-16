@@ -5,14 +5,14 @@ import { StatusBar } from 'expo-status-bar';
 import { BlurView } from 'expo-blur';
 import { View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Home, Bookmark, PlusIcon, Bike, CircleUser, Heart } from 'lucide-react-native';
+import { Home, Bookmark, PlusIcon, Bike, CircleUser, Heart, MapIcon, CompassIcon } from 'lucide-react-native';
 
 const tabScreens = [
-  { name: 'home', title: 'Home', icon: Home },
+  { name: 'home', title: 'Explore', icon: CompassIcon },
   { name: 'bookmark', title: 'Bookmark', icon: Bookmark },
   { name: 'create', title: 'Create', icon: PlusIcon },
+  { name: 'mytrips', title: 'My Trips', icon: MapIcon },
   { name: 'trip', title: 'Current Trip', icon: Bike },
-  { name: 'account', title: 'Account', icon: CircleUser },
 ];
 
 const TabsLayout = () => {
