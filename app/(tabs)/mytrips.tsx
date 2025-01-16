@@ -8,11 +8,11 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import useAllTrips from '@/hooks/useAllTrips';
 import { supabase } from '@/lib/supabase';
 
-const TripCard = ({ trip, index , setSyncing  }) => {
+const TripCard = ({ trip, index , setSyncing, setSyncedDate  }) => {
     const { refetch, markAsInProgress, markAsPlanned, markAsCompleted, deleteTrip } = useAllTrips(); // useAllTrips hook
     const [ status, setStatus ] = useState<'in_progress' | 'planned' | 'completed'>(trip.status);
     const [ deleted, setDeleted ] = useState<boolean>(false);
@@ -23,6 +23,7 @@ const TripCard = ({ trip, index , setSyncing  }) => {
   };
 
   const afterAction = async () => {
+    setSyncedDate(new Date());
     await refetch();
     setUpdated(false);
     setSyncing(false);
@@ -211,11 +212,16 @@ const AllTrips = () => {
     const { trips, loading, isError, error, refetch } = useAllTrips(); // useAllTrips hook
     const [refreshing, setRefreshing] = useState<boolean>(false);
     const [isSyncing, setSyncing] = useState<boolean>(false);
+    const [syncedDate, setSyncedDate] = useState<Date | null>(new Date());
+
 
     const handleRefresh = useCallback(async () => {
         setRefreshing(true);
+        setSyncing(true);
+        setSyncedDate(new Date());
         await refetch();
         setRefreshing(false);
+        setSyncing(false);
     }, [refetch]);
 
   if (loading) {
@@ -240,36 +246,46 @@ const AllTrips = () => {
     <SafeAreaView className="flex-1 bg-zinc-900 pb-24">
       <StatusBar style="light" />
       <View className="flex-1 px-4 pt-6">
-        <View className="flex-row items-center mb-4 justify-between">
-            <View className="flex-row items-center">
-            <View className="flex-row items-center px-4">
-                <Animated.Text
-                entering={FadeInDown.duration(500).springify()}
-                className="text-3xl font-bold text-white "
-                >
-                    <Text className="text-3xl font-bold text-white text-white">My Trips</Text>
-                </Animated.Text>
-            </View>
-            {isSyncing && <View className="flex-row items-center ">
-                <Animated.Text
-                entering={FadeInDown.duration(500).springify()}
-                className="text-3xl font-bold text-white "
-                >
-                    <Ionicons name="refresh" size={10} color="gray" className='pr-2'/>
-                    <Text className="text-sm italic text-gray-500"> syncing...</Text>
-                </Animated.Text>
-            </View>}
-            </View>
+            <View className="flex-row items-center mb-4 justify-between">
+                <View className="flex-row items-center">
+                <View className="flex-row items-center px-4">
+                    <Animated.Text
+                    entering={FadeInDown.duration(500).springify()}
+                    className="text-3xl font-bold text-white "
+                    >
+                        <Text className="text-3xl font-bold text-white text-white">My Trips</Text>
+                    </Animated.Text>
+                </View>
+                 <View className="flex-row items-center ">
+                    <Animated.Text
+                    entering={FadeInDown.duration(500).springify()}
+                    className="text-3xl font-bold text-white "
+                    >
+                        {isSyncing &&<Ionicons name="refresh" size={10} color="gray" className='pr-2'/>}
+                        <Text className="text-sm italic text-gray-500">{isSyncing ? ' syncing...'
+                        : (syncedDate && syncedDate < new Date(Date.now() - 86400000)) ? 'last synced at '+ 
+                            syncedDate?.toLocaleString([], { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit', 
+                            hour: '2-digit', 
+                            minute: '2-digit', 
+                            hour12: true 
+                          }) : 'last synced at '+ 
+                          syncedDate?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h12' })} </Text>
+                    </Animated.Text>
+                </View>
+                </View>
 
-            <View className="flex-row items-center px-4">
-                <Animated.Text
-                entering={FadeInDown.duration(500).springify()}
-                className="text-3xl font-bold text-white"
-                >
-                    <Text className="text-white text-sm ml-2">{trips.length} Trips</Text>
-                </Animated.Text>
+                <View className="flex-row items-center px-4">
+                    <Animated.Text
+                    entering={FadeInDown.duration(500).springify()}
+                    className="text-3xl font-bold text-white"
+                    >
+                        <Text className="text-white text-sm ml-2">{trips.length} Trips</Text>
+                    </Animated.Text>
+                </View>
             </View>
-        </View>
         {trips.length === 0 ? (
           <View className="flex-1 justify-center items-center">
             <Ionicons name="airplane-outline" size={64} color="#fcbf49" />
@@ -281,9 +297,9 @@ const AllTrips = () => {
           <FlatList
             data={trips}
             keyExtractor={(item) => item.trip_id}
-            renderItem={({ item, index  }) => <TripCard trip={item} index={index}  setSyncing={setSyncing} />}
+            renderItem={({ item, index  }) => <TripCard trip={item} index={index}  setSyncing={setSyncing} setSyncedDate={setSyncedDate} />}
             showsVerticalScrollIndicator={false}
-            refreshing={refreshing}
+            refreshing={false}
             onRefresh={handleRefresh}
           />
         )}
