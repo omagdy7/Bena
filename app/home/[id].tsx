@@ -25,6 +25,9 @@ const PlaceDetails: React.FC = () => {
   const [isGoodFeedback, setIsGoodFeedback] = useState<'up' | 'down'| null>(null);
   const [isCheap, setIsCheap] = useState<'expensive' | 'affordable' | null>(null);
   const [isEasy, setIsEasy] = useState<'exhausting' | 'relaxing' | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const maxDescriptionLength = 150; // Maximum length of description to show before expanding
+  
 
 
 
@@ -122,11 +125,11 @@ const PlaceDetails: React.FC = () => {
 
 
   const handleClickOnTiktok = async () => {
-    Linking.openURL(`https://www.google.com/search?q=site%3Atiktok.com+${place?.name}`);
+    Linking.openURL(`https://www.google.com/search?q=site%3Atiktok.com+${place?.name} ${place?.city}  ${!(place?.arabic_name === "Not available yet") ? place?.arabic_name : ''}`);
   };
 
   const handleClickOnInstagram = async () => {
-    Linking.openURL(`https://www.google.com/search?q=site%3Ainstagram.com+${place?.name}`);
+    Linking.openURL(`https://www.google.com/search?q=site%3Ainstagram.com+${place?.name} ${place?.city}  ${!(place?.arabic_name === "Not available yet") ? place?.arabic_name : ''}`);
 
   }
 
@@ -139,13 +142,23 @@ const PlaceDetails: React.FC = () => {
   }
 
   const handleClickOnYoutube = async () => {
-    Linking.openURL(`https://www.google.com/search?q=site%3Ayoutube.com+${place?.name}`);
+    Linking.openURL(`https://www.google.com/search?q=site%3Ayoutube.com+${!(place?.arabic_name === "Not available yet") ? place?.arabic_name : place?.name + place?.city}`);
 
   }
 
   const handleClickOnTripadvisor = async () => {
     Linking.openURL(`https://www.google.com/search?q=site%3Atripadvisor.com+${place?.name}`);
   }
+
+
+  const toggleExpanded = async() => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const description =
+    place?.description.length > maxDescriptionLength && !isExpanded
+      ? `${place?.description.slice(0, maxDescriptionLength)}...`
+      : place?.description;
 
 
   useEffect(() => {
@@ -214,7 +227,7 @@ const PlaceDetails: React.FC = () => {
                 : <Ionicons name="bookmark" size={25} color="#fcbf49" />
             }
           </TouchableOpacity>
-      </View>
+      </View>``
       
       <Animated.View entering={FadeInUp.delay(300).duration(500)} className="p-6">
         <Animated.Text entering={FadeInDown.delay(400).duration(500)} className="text-4xl font-bold text-white width-full mb-2 flex-row justify-between items-center"><Text className="mr-4">{place?.name}</Text>
@@ -232,7 +245,15 @@ const PlaceDetails: React.FC = () => {
           </TouchableOpacity>
         </Animated.View>
 
-        <Animated.Text entering={FadeInDown.delay(600).duration(500)} className="text-gray-300 text-base leading-6 mb-2 rounded-xl px-2 py-2 bg-zinc-800 ">{place?.description}</Animated.Text>
+        { !(description === 'No description yet') && <TouchableOpacity onPress={toggleExpanded} >
+          <Animated.Text
+            entering={FadeInDown.delay(600).duration(500)}
+            className="text-gray-300 text-base leading-6 mb-2 rounded-xl p-4 bg-zinc-800"
+          >
+            {description}<Text className="text-blue-400">{isExpanded || description.length < maxDescriptionLength ? null : ' Show More'}</Text>
+          </Animated.Text>
+        </TouchableOpacity>}
+
         <Animated.View
           entering={FadeInDown.delay(800).duration(500)}
           className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 px-2 rounded-xl border-2 border-zinc-700"
