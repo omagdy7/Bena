@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Image } from 'react-native';
+import { View, TouchableOpacity, Image, Linking } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInRight } from 'react-native-reanimated';
@@ -10,6 +10,12 @@ import { TripStep, Place } from '@/db/schema';
 import TimelineNode from './TimelineNode';
 import { Button } from './ui/button';
 import { MapPinned } from 'lucide-react-native';
+import { router, useFocusEffect } from 'expo-router';
+import useAllTrips from '@/hooks/useAllTrips';
+
+
+
+
 
 interface TripStepCardProps {
   step: TripStep & { place: Place };
@@ -27,18 +33,34 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
   totalSteps
 }) => {
 
-  const handleOnMapPress = () => {
-    // TODO: When the user clicks on the map it should open google maps on the phone and automatically naviagtes to the place
+  const { markAsVisited, markAsPending} = useAllTrips();
 
+
+  const handleOnMapPress = () => {
+    Linking.openURL(step.place.external_link!);
+
+  }
+
+  const handleMarkAsDone = async () => {
+    markAsVisited(step.step_id);
+  }
+
+  const handleMarkAsPending = async () => {
+    markAsPending(step.step_id);
   }
 
 
   const progress = step.status === 'visited' ? 1 : step.status === 'pending' ? 0 : 0.5;
 
   return (
+    <TouchableOpacity onPress={() => router.push(`/home/${step.place.places_id}`) } className="">
     <View className="flex-row">
       <View className="mr-4 h-full">
         <TimelineNode
+          style={{
+            backgroundColor: step.status === 'visited' ? 'green' : step.status === 'in_progress' ? 'orange' : 'gray',
+            color: step.status === 'visited' || step.status === 'in_progress' ? 'white' : 'black',
+          }}
           isCompleted={step.status === 'visited'}
           isActive={step.status === 'in_progress'}
           isLast={isLast}
@@ -49,17 +71,24 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
         className="flex-1 bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 mb-4"
       >
         <View className="p-4">
-          <View className="flex-row justify-between items-center mb-3">
+          <View className="flex-row justify-between items-center">
             <Text className="text-white text-lg font-bold">
-              {step.place.name}
+            {step.place.name.length > 20 ? `${step.place.name.slice(0, 30)}...` : step.place.name}
             </Text>
+
             <TouchableOpacity
               onPress={onEdit}
-              className="bg-zinc-800 p-2 rounded-full"
+              className=" p-1 rounded-full flex-row items-center gap-1"
             >
-              <Ionicons name="pencil" size={16} color="#fcbf49" />
+              
+              <Ionicons name="pencil" size={12} color="#fcbf49" />
+              <Text className="text-[#fcbf49] text-xs">Edit</Text>
             </TouchableOpacity>
           </View>
+          <TouchableOpacity className="flex-row items-center bg-zinc-800 px-2 py-1 rounded-full my-2">
+                <Ionicons name="location-outline" size={10} color="#fcbf49" />
+                <Text className="text-white text-sm px-1">{step.place.city}</Text>
+              </TouchableOpacity>
 
           <Image
             source={{ uri: step.place.image }}
@@ -72,26 +101,23 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
               {/* <Text className="text-secondary">Start Time: {format(step.start_time, 'h:mm a')}</Text>
               <Text className="text-secondary">End Time: {format(step.end_time, 'h:mm a')}</Text> */}
             </View>
-            <ProgressBar progress={progress} index={index} />
           </View>
 
-          <View className="flex-row justify-between items-center">
-            <View>
-              {/* <Text className="text-zinc-400 mb-1">{step.place.address.slice(0, 13)}</Text> */}
-              <RatingStars rating={step.place.rating} />
-            </View>
-            <View className="flex-row gap-2">
-              <TouchableOpacity className="bg-zinc-800 px-3 py-1 rounded-full">
-                <Text className="text-white">{step.place.city}</Text>
+          <View className="">
+            <View className="flex-row gap-flex-row justify-between items-center">
+              <TouchableOpacity onPress={handleOnMapPress} className="flex-row items-center bg-zinc-800 px-3 py-1 rounded-full">
+                <Ionicons name="map-outline" size={16} color="#fcbf49" />
+                <Text className="text-white text-sm px-1">Open On Maps</Text>
               </TouchableOpacity>
-              <Button size='icon' variant={'ghost'} className='bg-zinc-800 px-3 py-1 rounded-full' onPress={handleOnMapPress}>
-                <MapPinned size={20} color={'white'} />
-              </Button>
+              <TouchableOpacity onPress={step.status === 'visited' ? handleMarkAsPending : handleMarkAsDone} className="flex-row items-center bg-zinc-800 px-3 py-1 rounded-full">
+                <Ionicons name={step.status === 'visited' ? "return-up-back-outline" : "checkmark-done-circle-outline"} size={16} color="#fcbf49" />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
       </Animated.View >
     </View >
+    </TouchableOpacity>
   );
 };
 

@@ -250,7 +250,8 @@ const PlaceDetails: React.FC = () => {
             entering={FadeInDown.delay(600).duration(500)}
             className="text-gray-300 text-base leading-6 mb-2 rounded-xl p-4 bg-zinc-800"
           >
-            {description}<Text className="text-blue-400">{isExpanded || description.length < maxDescriptionLength ? null : ' Show More'}</Text>
+            <Text>{description} </Text>
+            {isExpanded || description.length < maxDescriptionLength ? null : (<Text className="text-blue-400">Show More</Text>)}
           </Animated.Text>
         </TouchableOpacity>}
 

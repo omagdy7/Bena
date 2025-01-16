@@ -140,6 +140,29 @@ const useAllTrips = () => {
     return data;
   };
 
+  const markAsVisited = async (stepId) => {
+    const { data, error } = await supabase
+      .from('tripstep')
+      .update({ status: 'visited' })  // Update the status to 'visited'
+      .eq('step_id', stepId);
+
+    if (error) throw error;
+    await refetch();
+    return data;
+  };
+
+  const markAsPending = async (stepId) => {
+    const { data, error } = await supabase
+      .from('tripstep')
+      .update({ status: 'pending' })  // Update the status to 'visited'
+      .eq('step_id', stepId);
+
+    if (error) throw error;
+    await refetch();
+    return data;
+  };
+
+
   const {
     data,
     isLoading,
@@ -164,6 +187,8 @@ const useAllTrips = () => {
     markAsPlanned,
     deleteTrip,
     isSyncing,
+    markAsVisited,
+    markAsPending,
   };
 };
 

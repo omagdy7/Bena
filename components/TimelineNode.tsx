@@ -14,7 +14,7 @@ const TimelineNode: React.FC<TimelineNodeProps> = ({ isCompleted, isActive, isLa
       <Animated.View
         entering={FadeIn.delay(300)}
         className={`w-10 h-10 rounded-full border-2 ${isActive
-          ? 'bg-secondary border-secondary'
+          ? 'bg-zinc-800 border-[#fcbf49]'
           : isCompleted
             ? 'bg-green-500 border-green-500'
             : 'bg-zinc-800 border-zinc-700'
