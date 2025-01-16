@@ -16,6 +16,7 @@ const TripCard = ({ trip, index,  }) => {
     const { refetch, markAsInProgress, markAsPlanned, markAsCompleted, deleteTrip } = useAllTrips(); // useAllTrips hook
     const [ status, setStatus ] = useState<'in_progress' | 'planned' | 'completed'>(trip.status);
     const [ deleted, setDeleted ] = useState<boolean>(false);
+    const[ isUpdated, setUpdated ] = useState<boolean>(false);
 
     const handlePress = () => {
     router.push(`/trips/${trip.trip_id}`);
@@ -27,8 +28,11 @@ const TripCard = ({ trip, index,  }) => {
 
   const handleSwitchToInProgress = async () => {
     setStatus('in_progress');
+    setUpdated(true);
     await markAsInProgress(trip.trip_id);
     await afterAction();
+    setUpdated(false);
+
   };
 
   const handleSwitchToCompleted = async () => {
@@ -38,13 +42,14 @@ const TripCard = ({ trip, index,  }) => {
   };
 
   const handleSwitchToPlanned = async () => {
+    setUpdated(true);
     setStatus('planned');
     await markAsPlanned(trip.trip_id);
     await afterAction();
+    setUpdated(false);
   };
 
   const handleDeleteTrip = async () => {
-    
     Alert.alert(
         'Delete Trip',
         'Are you sure you want to delete this trip?',
@@ -69,12 +74,16 @@ const TripCard = ({ trip, index,  }) => {
       );
   };
 
+  const handleShareTrip = async () => {
+    // TODO: Implement share trip functionality
+  };
+
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 100).springify()}
       className="mb-4"
     >
-        { !deleted && <Animated.View className={`rounded-2xl overflow-hidden border-2 p-2 border-zinc-800 ${status === 'planned' ? 'bg-gray-600' : status === 'in_progress' ? 'bg-gray-600' : 'bg-gray-500'}`}>
+        { !deleted && <Animated.View className={`rounded-2xl overflow-hidden border-2 p-2 border-zinc-800 bg-gray-600`}>
         <TouchableOpacity onPress={handlePress}>
         <BlurView intensity={30} className="rounded-2xl overflow-hidden">
           <LinearGradient
@@ -84,14 +93,24 @@ const TripCard = ({ trip, index,  }) => {
             <View className="flex-row justify-between items-center mb-2">
               <Text className="text-white text-xl font-bold">{trip.title}</Text>
 
-              <View className={` flex-row items-center rounded-full px-2 py-1 ${status === 'planned' ? trip?.start_date > new Date() ? 'bg-blue-400' : 'bg-gray-300' : status === 'in_progress' ? 'bg-[#fcbf49]' : 'bg-gray-300'}`}>
-                <Ionicons name={status === 'planned' ? 'time-outline' : status === 'in_progress' ? 'airplane-outline' : 'checkmark-done'} size={16} color="black" />
+              <View className={` flex-row items-center rounded-full px-2 py-1 ${
+                isUpdated ? status === 'planned' ? 'bg-gray-300' : status === 'in_progress' ? 'bg-[#fcbf49]' : 'bg-gray-300' 
+                : trip.status === 'planned' ? 'bg-gray-300' : trip.status === 'in_progress' ? 'bg-[#fcbf49]' : 'bg-gray-300'}`}>
+                <Ionicons name={
+                    isUpdated ? status === 'planned' ? 'time-outline' : status === 'in_progress' ? 'airplane-outline' : 'checkmark-done' 
+                    : trip.status === 'planned' ? 'time-outline' : trip.status === 'in_progress' ? 'airplane-outline' : 'checkmark-done'
+                    } size={16} color="black" />
                 <Text className="text-xs text-zinc-900 font-semibold ml-1">
-                    {status === 'planned'
+                    {isUpdated ? status === 'planned'
                         ? 'Planned'
                         : status === 'in_progress'
                         ? 'Currently Active'
-                        : 'Completed'}
+                        : 'Completed': trip.status === 'planned'
+                        ? 'Planned'
+                        : trip.status === 'in_progress'
+                        ? 'Currently Active'
+                        : 'Completed'
+                        }
                 </Text>
               </View>
 
@@ -131,19 +150,38 @@ const TripCard = ({ trip, index,  }) => {
       </TouchableOpacity>
       <View className="flex-row justify-between items-center">
       <TouchableOpacity
-        style={{ width: 120 }}
-        onPress={status === 'planned' ? handleSwitchToInProgress : status === 'in_progress' ? handleSwitchToPlanned : handleSwitchToPlanned}
-        className={`p-2 mt-2 rounded-xl  flex-row items-center justify-center ${status === 'planned' ? 'bg-green-300' : status === 'in_progress' ? 'bg-gray-300' : 'bg-blue-300'} `}>
+        disabled={isUpdated}
+        style={{ width: 115 }}
+        onPress={trip.status === 'planned' ? handleSwitchToInProgress : trip.status === 'in_progress' ? handleSwitchToPlanned : handleSwitchToPlanned}
+        className={`p-2 mt-2 rounded-xl  flex-row items-center justify-center ${
+            isUpdated ? status === 'planned' ? 'bg-green-300' : status === 'in_progress' ? 'bg-gray-300' : 'bg-blue-300' 
+            : trip.status === 'planned' ? 'bg-green-300' : trip.status === 'in_progress' ? 'bg-gray-300' : 'bg-blue-300'} `}>
         <Ionicons
-            name={status === 'planned' ? 'play' : status === 'in_progress' ? 'pause' : 'refresh'}
+            name={
+                isUpdated ? status === 'planned' ? 'play' : status === 'in_progress' ? 'pause' : 'refresh' 
+                : trip.status === 'planned' ? 'play' : trip.status === 'in_progress' ? 'pause' : 'refresh'}
             size={18}
             color="black"
         />
-        <Text className="ml-2 text-sm font-bold text-black">{status === 'planned' ? 'Mark As Active' : status === 'in_progress' ? 'Hold For Later' : 'Repeat The Trip'}</Text>
+        <Text className="ml-1 text-sm font-bold text-black">{
+            isUpdated ? status === 'planned' ? 'Mark As Active' : status === 'in_progress' ? 'Hold For Later' : 'Repeat Trip' 
+            : trip.status === 'planned' ? 'Mark As Active' : trip.status === 'in_progress' ? 'Hold For Later' : 'Repeat Trip'}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={{ width: 120 }}
+        style={{ width: 115 }}
+        onPress={handleShareTrip}
+        className={`p-2 mt-2 rounded-xl  flex-row items-center justify-center bg-zinc-900`}>
+        <Ionicons
+            name='share-outline'
+            size={18}
+            color="white"
+        />
+        <Text className="ml-2 text-sm font-bold text-white">Share Trip</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{ width: 115 }}
         onPress={handleDeleteTrip}
         className={`p-2 mt-2 rounded-xl  flex-row items-center justify-center bg-red-400`}> `
         <Ionicons

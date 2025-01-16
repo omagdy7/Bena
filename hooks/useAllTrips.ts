@@ -80,12 +80,25 @@ const useAllTrips = () => {
   
   // Mark a trip as 'in progress'
   const markAsInProgress = async (tripId) => {
+     // make sure this is only in_progress in all trips
+
+     // Step 1: Update all trips for the user with status 'in_progress' to 'planned'
+    const { error: resetError } = await supabase
+    .from('trips')
+    .update({ status: 'planned' })
+    .eq('user_id', user.id)
+    .eq('status', 'in_progress'); // Target only in_progress trips
+
+    if (resetError) throw resetError;
+
+     // update the trip status to in_progress
     const { data, error } = await supabase
       .from('trips')
       .update({ status: 'in_progress' })
       .eq('trip_id', tripId);
 
     if (error) throw error;
+
     return data;
   };
 
