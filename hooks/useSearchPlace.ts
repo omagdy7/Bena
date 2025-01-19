@@ -9,12 +9,22 @@ interface SearchPlaceResponse {
 export const useSearchPlace = () => {
     const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL;
     const SEARCH_PLACE_ROUTE = process.env.EXPO_PUBLIC_SEARCH_PLACE_ROUTE;
+    const NEARBY_PLACE_ROUTE = process.env.EXPO_PUBLIC_PLACES_NEARBY_ROUTE;
     
     const getSearchedPlaces = async (searchText: string) => {
         if (!searchText) {
         return [];
         }
         const API_URL = `${SERVER_URL}/${SEARCH_PLACE_ROUTE}/${searchText}`;
+        const response = await fetch(API_URL);
+        if (!response.ok) {
+        throw new Error('Failed to fetch places');
+        }
+        return response.json();
+    };
+
+    const getNearbyPlaces = async (placeID: string, radius=1) => {
+        const API_URL = `${SERVER_URL}/${NEARBY_PLACE_ROUTE}/${placeID}?radius=${radius}`;
         const response = await fetch(API_URL);
         if (!response.ok) {
         throw new Error('Failed to fetch places');
@@ -33,5 +43,5 @@ export const useSearchPlace = () => {
         },
     });
 
-    return { getPlaces: getSearchedPlaces, places: data?.places ?? [], loading: isLoading, isError, error, refetch };
+    return { getPlaces: getSearchedPlaces, getNearbyPlaces: getNearbyPlaces, places: data?.places ?? [], loading: isLoading, isError, error, refetch };
 };

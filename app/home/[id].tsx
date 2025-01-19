@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { View, ScrollView, Text, ActivityIndicator, Dimensions, TouchableOpacity, Linking, Platform } from 'react-native';
+import { View, ScrollView, Text, ActivityIndicator, Dimensions, TouchableOpacity, Linking, Platform, FlatList, Image } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { Place } from '@/db/schema';
 import { BlurView } from 'expo-blur';
@@ -10,6 +10,8 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import FastImage from 'react-native-fast-image';
 import { useAuth } from '@/context/AuthProvider';
 import MapView, { Marker } from 'react-native-maps';
+import { useSearchPlace } from '@/hooks/useSearchPlace';
+import { router } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -27,6 +29,10 @@ const PlaceDetails: React.FC = () => {
   const [isEasy, setIsEasy] = useState<'exhausting' | 'relaxing' | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const maxDescriptionLength = 150; // Maximum length of description to show before expanding
+  const {getNearbyPlaces} = useSearchPlace();
+  const [nearbyPlaces, setNearbyPlaces] = useState<Place[]>([]);
+  const [isMapVisible, setIsMapVisible] = useState(false);
+  const SEARCH_RADIUS = 2;
   
 
 
@@ -35,6 +41,8 @@ const PlaceDetails: React.FC = () => {
   // Check if place is bookmarked on component mount
   useEffect(() => {
     const checkBookmarkStatus = async () => {
+      const nearbyPlaces = await getNearbyPlaces(id,SEARCH_RADIUS);
+      setNearbyPlaces(nearbyPlaces.near_places);
       if (!user || !id) return;
 
       try {
@@ -199,6 +207,28 @@ const PlaceDetails: React.FC = () => {
       </View>
     );
   }
+
+
+  const renderNearbyPlace = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      className="bg-zinc-800 p-4 rounded-lg mr-4"
+      onPress={() => handlePlaceClick(item.place_id)} // Update `place_id` to match your data model
+    >
+      <FastImage
+        source={{ uri: item.image }}
+        style={{ width: 160, height: 96, borderRadius: 8 }} // Adjusted to match "w-40 h-24 rounded-lg"
+        resizeMode={FastImage.resizeMode.cover}
+      />
+      <View className="mt-2">
+        <Text className="text-white text-sm font-bold">{item.name}</Text>
+        <Text className="text-gray-400 text-xs">{item.city}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const handlePlaceClick = (place_id: string) => {
+    router.push(`../../../mytrips}`); // Navigate to the Place screen with the placeId
+  };
 
   return (
     <ScrollView className="flex-1 bg-zinc-900">
@@ -425,10 +455,27 @@ const PlaceDetails: React.FC = () => {
             </TouchableOpacity>
           </View>
 
+          <Animated.View
+            entering={FadeInDown.delay(800).duration(500)}
+            className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 px-2 rounded-xl border-2 border-zinc-900 shadow-lg"
+          >
+            <Text className="text-white text-xl font-bold mb-4 py-2 px-2" style={{ color: '#AAA' }}>
+              Nearby Places
+            </Text>
+
+            <FlatList
+              data={nearbyPlaces}
+              keyExtractor={(item) => item.place_id} // Ensure `place_id` is unique
+              renderItem={renderNearbyPlace}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16 }}
+            />
+          </Animated.View>
         </Animated.View>
-        {/* todo add nearby places and show first places in use's bookmark */}
-      </Animated.View>
-    </ScrollView>
+        </Animated.View>
+      </ScrollView>
+
   );
 };
 

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Place } from '@/db/schema';
-import { useAuth } from '@/context/AuthProvider'; // Assuming you have this hook
+import { useAuth } from '@/context/AuthProvider'; 
 
 const fetchUserBookmarks = async (userId: string): Promise<Place[]> => {
   if (!userId) return [];
@@ -47,6 +47,31 @@ const fetchUserBookmarks = async (userId: string): Promise<Place[]> => {
   return data?.map(bookmark => bookmark.places) || [];
 };
 
+const addToBookmarks = async (userId: string, placeId: string) => {
+  const { data, error } = await supabase.from('bookmarks').insert({
+    place_id: placeId,
+    user_id: userId,
+  });
+
+  if (error) {
+    console.error('Error adding to bookmarks:', error.message);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+const removeFromBookmarks = async (userId: string, placeId: string) => {
+  const { data, error } = await supabase.from('bookmarks').delete().eq('place_id', placeId).eq('user_id', userId);
+
+  if (error) {
+    console.error('Error removing from bookmarks:', error.message);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
 export const useUserBookmarks = () => {
   const { user } = useAuth();
 
@@ -62,10 +87,13 @@ export const useUserBookmarks = () => {
     refetchOnMount: 'always', // Always refetch data when the component mounts
   });
 
+
   return {
     bookmarkedPlaces,
     loading,
     error: isError ? (error as Error).message : null,
     refetch,
+    addToBookmarks,
+    removeFromBookmarks,
   };
 };
