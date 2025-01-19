@@ -10,6 +10,9 @@ import { BlurView } from 'expo-blur';
 import { SafeAreaView, TouchableOpacity, ScrollView, View, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import useAllTrips from '@/hooks/useAllTrips';
+import HomeSkeleton from '@/components/HomeSkeleton';
+import { LinearGradient } from 'expo-linear-gradient';
+
 
 
 const TripTimeline = () => {
@@ -201,8 +204,8 @@ const TripTimeline = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-zinc-900 justify-center items-center">
-        <Text className="text-white">Loading...</Text>
+      <SafeAreaView className="flex-1 bg-zinc-900">
+        <HomeSkeleton/>
       </SafeAreaView>
     );
   }
@@ -262,6 +265,17 @@ const TripTimeline = () => {
         </View>
     </View>
     <View className="flex-row items-center justify-between px-2 pb-4">
+    <TouchableOpacity
+        style={{ width: 120 }}
+        onPress={handleSwitchToPlanned}
+        className={`p-2 mt-2 rounded-xl flex-row items-center justify-center bg-gray-300 mx-1`}>
+        <Ionicons
+            name='pause-circle-outline'
+            size={18}
+            color="black"
+        />
+        <Text className="ml-1 text-sm font-bold text-black">Hold for Later</Text>
+      </TouchableOpacity>
       <TouchableOpacity
         style={{ width: 120 }}
         onPress={handleSwitchToCompleted}
@@ -275,19 +289,9 @@ const TripTimeline = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={{ width: 120 }}
-        onPress={handleSwitchToPlanned}
-        className={`p-2 mt-2 rounded-xl flex-row items-center justify-center bg-gray-400 mx-1`}>
-        <Ionicons
-            name='pause-circle-outline'
-            size={18}
-            color="black"
-        />
-        <Text className="ml-1 text-sm font-bold text-black">Hold for Later</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{ width: 120 }}
         onPress={handleOpenOnMaps}
-        className={`p-2 mt-2 rounded-xl  flex-row items-center justify-center bg-white ml-1`}>
+        className={`p-2 mt-2 rounded-xl  flex-row items-center justify-center ml-1 bg-white border border-black`}>
+          
         <Ionicons
             name='navigate-circle-outline'
             size={18}

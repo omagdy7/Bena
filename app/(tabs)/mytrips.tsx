@@ -11,6 +11,8 @@ import { router } from 'expo-router';
 import { format, set } from 'date-fns';
 import useAllTrips from '@/hooks/useAllTrips';
 import { supabase } from '@/lib/supabase';
+import HomeSkeleton from '@/components/HomeSkeleton';
+
 
 const TripCard = ({ trip, index , setSyncing, setSyncedDate  }) => {
     const { refetch, markAsInProgress, markAsPlanned, markAsCompleted, deleteTrip } = useAllTrips(); // useAllTrips hook
@@ -19,7 +21,11 @@ const TripCard = ({ trip, index , setSyncing, setSyncedDate  }) => {
     const[ isUpdated, setUpdated ] = useState<boolean>(false);
 
     const handlePress = () => {
-    router.push(`/trips/${trip.trip_id}`);
+    if(trip.status === 'in_progress'){
+      router.push(`/trip`);
+    } else {
+      router.push(`/mytrips/${trip.trip_id}`);
+    }
   };
 
   const afterAction = async () => {
@@ -228,7 +234,7 @@ const AllTrips = () => {
     return (
       <SafeAreaView className="flex-1 bg-zinc-900 justify-center items-center">
         <StatusBar style="light" />
-        <Text className="text-white">Loading your trips...</Text>
+        <HomeSkeleton/>
       </SafeAreaView>
     );
   }

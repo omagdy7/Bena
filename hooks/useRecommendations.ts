@@ -9,6 +9,9 @@ interface RecommendationResponse {
 export const useRecommendations = () => {
   const user = useAuthCheck();
   const RECOMMENDATION_ENDPOINT = process.env.EXPO_PUBLIC_RECOMMENDATION_MODEL_ENDPOINT;
+  const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL;
+  const RECOMMENDATION_ROUTE = process.env.EXPO_PUBLIC_RECOMMENDATION_ROUTE;
+
 
   const {
     data,
