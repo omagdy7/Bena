@@ -10,8 +10,8 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import FastImage from 'react-native-fast-image';
 import { useAuth } from '@/context/AuthProvider';
 import MapView, { Marker } from 'react-native-maps';
-import { useSearchPlace } from '@/hooks/useSearchPlace';
 import { router } from 'expo-router';
+import NearbyCarousal from '@/components/NearbyCarousal';
 
 const { width } = Dimensions.get('window');
 
@@ -29,10 +29,7 @@ const PlaceDetails: React.FC = () => {
   const [isEasy, setIsEasy] = useState<'exhausting' | 'relaxing' | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const maxDescriptionLength = 150; // Maximum length of description to show before expanding
-  const {getNearbyPlaces} = useSearchPlace();
-  const [nearbyPlaces, setNearbyPlaces] = useState<Place[]>([]);
-  const [isMapVisible, setIsMapVisible] = useState(false);
-  const SEARCH_RADIUS = 2;
+
   
 
 
@@ -455,25 +452,19 @@ const PlaceDetails: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          <Animated.View
+          
+        </Animated.View>
+        <Animated.View
             entering={FadeInDown.delay(800).duration(500)}
-            className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 px-2 rounded-xl border-2 border-zinc-900 shadow-lg"
+            className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 rounded-xl border-2 border-zinc-900 shadow-lg"
           >
-            <Text className="text-white text-xl font-bold mb-4 py-2 px-2" style={{ color: '#AAA' }}>
-              Nearby Places
-            </Text>
+            <Text className="text-white text-xl font-bold mb-4 py-2 px-2 mx-4" style={{ color: '#AAA' }}>Nearby Places</Text>
 
-            <FlatList
-              data={nearbyPlaces}
-              keyExtractor={(item) => item.place_id} // Ensure `place_id` is unique
-              renderItem={renderNearbyPlace}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 16 }}
-            />
+            <NearbyCarousal mainPlaceId={id} />
+            
           </Animated.View>
         </Animated.View>
-        </Animated.View>
+        
       </ScrollView>
 
   );

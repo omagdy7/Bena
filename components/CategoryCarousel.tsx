@@ -6,14 +6,15 @@ import FastImage from 'react-native-fast-image';
 import { PlaceSubset } from '@/hooks/useCategoricalPlaces';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = width * 0.85;
 
 interface CategoryCarouselProps {
   places: PlaceSubset[] | null;
   onPlacePress: (placeId: string) => void;
+  cardWidthRatio?: number;
 }
 
-export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ places, onPlacePress }) => {
+export const CategoryCarousel: React.FC<CategoryCarouselProps> = ({ places, onPlacePress, cardWidthRatio=0.85 }) => {
+  const CARD_WIDTH = width * cardWidthRatio;
   const [currentIndex, setCurrentIndex] = useState(0);
   const position = useRef(new Animated.Value(0)).current;
   const MAX_VISIBLE_DOTS = 5;
