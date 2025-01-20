@@ -19,7 +19,7 @@ export default function App() {
     if (!loading && user) {
       // Redirect to the home page if a user session exists
       setTimeout(() => {
-        router.replace("/home");
+        // router.replace("/home");
       }, 0.250)
     }
   }, [user, loading]);

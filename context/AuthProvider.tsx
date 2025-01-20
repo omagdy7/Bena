@@ -94,6 +94,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password,
       });
       if (error) throw error;
+
       return { user: data.user, session: data.session };
     } catch (error) {
       throw error;
@@ -106,7 +107,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email,
         password,
       });
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes('invalid_credentials')) {
+          throw new Error('Invalid email or password.');
+        } else if (error.message.includes('user_not_found')) {
+          throw new Error('No account found for this email.');
+        } else {
+          throw error; // For other errors, we throw the original error
+        }
+      }
       return { user: data.user, session: data.session };
     } catch (error) {
       throw error;
@@ -143,6 +152,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw error;
     }
   };
+  
 
   const value: AuthContextType = {
     ...state,

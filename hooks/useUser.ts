@@ -7,6 +7,8 @@ interface UseProfileResult {
   profile: Users | null;
   loading: boolean;
   error: string | null;
+  updateUserName: (name: string) => Promise<void>;
+  checkNullUserNames: () => Promise<Boolean>
 }
 
 const fetchUser = async (userId: string | null): Promise<Users | null> => {
@@ -34,9 +36,22 @@ export function useUser(userId: string | null): UseProfileResult {
     staleTime: Infinity, // Prevent automatic refetching
   });
 
+  const checkNullUserNames = async () => {
+    const { data, error } = await supabase.from('users').select('username').eq('id', userId);
+    if (error) throw error;
+    if (!data[0]?.username) return true;
+    return false;
+  };
+  const updateUserName = async (name: string) => {
+    await supabase.from('users').update({ username: name }).eq('id', userId);
+  };
+
   return {
     profile,
     loading,
     error: isError ? (error as Error).message : null,
+    updateUserName,
+    checkNullUserNames,
+    
   };
 }

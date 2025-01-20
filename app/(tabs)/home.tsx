@@ -21,6 +21,9 @@ import RecommendationCarousel from '@/components/RecommendationCarousel';
 import { PlaceSubset } from '@/hooks/useCategoricalPlaces';
 import { Hero } from '@/components/Hero';
 import { StatusBar } from 'expo-status-bar';
+import { useAuth } from '@/context/AuthProvider';
+import { useUser } from '@/hooks/useUser';
+
 
 const { height } = Dimensions.get('window');
 const HEADER_HEIGHT = height * 0.4;

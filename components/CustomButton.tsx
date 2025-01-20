@@ -17,7 +17,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 }) => {
   return (
     <TouchableOpacity
-      className="bg-secondary py-4 rounded-full items-center justify-center flex-row"
+      className="bg-[#fcbf49] py-4 rounded-full items-center justify-center flex-row"
       onPress={handlePress}
       disabled={isLoading}
     >
