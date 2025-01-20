@@ -15,7 +15,7 @@ interface FormData {
 }
 
 const NewAccount = () => {
-  const { user } = useAuth()
+  const { user, completedSignUp, setCompletedSignUp } = useAuth()
   const [form, setForm] = useState<FormData>({
     username: ''
   })
@@ -52,9 +52,10 @@ const NewAccount = () => {
         throw dbError;
       }
       setUserNameAlreadyExists(true);
+      // setCompletedSignUp();
       router.replace('/home');
     }
-  
+    
     setIsSubmitting(false);
     };
 

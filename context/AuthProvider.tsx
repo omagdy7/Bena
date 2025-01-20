@@ -7,6 +7,7 @@ interface AuthState {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  completedSignUp: boolean;
 }
 
 interface SignInCredentials {
@@ -22,6 +23,7 @@ interface AuthContextType extends AuthState {
   updateUser: (updates: { email?: string; password?: string; data?: object }) => Promise<{
     user: User;
   }>;
+  setCompletedSignUp: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,6 +45,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user: null,
     session: null,
     loading: true,
+    completedSignUp: false,
   });
 
   useEffect(() => {
@@ -55,14 +58,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error,
         } = await supabase.auth.getSession();
 
+        const { data } = await supabase.from('users').select('username').eq('id', session?.user?.id);
+
+
         if (error) throw error;
 
         if (mounted) {
+          console.log('username:', data[0]?.username);
+          console.log('Completed sign up:', data[0]?.username == null ? false : true);
           setState(prev => ({
             ...prev,
             session,
             user: session?.user ?? null,
             loading: false,
+            completedSignUp: data[0]?.username == null ? false : true,
           }));
         }
       } catch (error) {
@@ -125,6 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
+      setState(prev => ({ ...prev, completedSignUp: false }));
       if (error) throw error;
       router.push('/')
     } catch (error) {
@@ -152,6 +162,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw error;
     }
   };
+
+  const setCompletedSignUp = () => {
+    setState(prev => ({ ...prev, completedSignUp: true }));
+  };
   
 
   const value: AuthContextType = {
@@ -161,6 +175,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signOut,
     resetPassword,
     updateUser,
+    setCompletedSignUp,
   };
 
   return (
