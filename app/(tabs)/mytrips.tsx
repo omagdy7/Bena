@@ -106,7 +106,19 @@ const TripCard = ({ trip, index , setSyncing, setSyncedDate  }) => {
             className="p-4"
           >
             <View className="flex-row justify-between items-center mb-2">
-              <Text className="text-white text-xl font-bold">{trip.title}</Text>
+
+              <View className="flex-row items-center gap-4">
+                {trip.user_id === "guest" && (
+                  <View className="flex-row items-center rounded-full px-2 py-1 bg-gray-300">
+                    <Ionicons name="people" size={16} color="black" />
+                    <Text className="text-xs text-black font-semibold ml-1">Guest</Text>
+                  </View>
+                )}
+                <Text className="text-white text-xl font-bold">{trip.title}</Text>
+                
+              </View>
+
+              
 
               <View className={` flex-row items-center rounded-full px-2 py-1 ${
                 isUpdated ? status === 'planned' ? 'bg-gray-300' : status === 'in_progress' ? 'bg-[#fcbf49]' : 'bg-gray-300' 
@@ -239,7 +251,7 @@ const AllTrips = () => {
     );
   }
 
-  if (isError) {
+  if (isError || !trips || !trips.length) {
     return (
       <SafeAreaView className="flex-1 bg-zinc-900 justify-center items-center">
         <StatusBar style="light" />

@@ -16,6 +16,9 @@ interface FormData {
 
 const NewAccount = () => {
   const { user, completedSignUp, setCompletedSignUp } = useAuth()
+  if (!user) {
+    router.replace('../index');
+  }
   const [form, setForm] = useState<FormData>({
     username: ''
   })

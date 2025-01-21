@@ -30,11 +30,12 @@ export default function App() {
       setTimeout(() => {
         router.replace("/home");
       }, 0.250)
-    } else if(!loading && user) {
-      setTimeout(() => {
-        router.replace("/new-account");
-      }, 0.250)
     }
+    // } else if(!loading && user) {
+    //   setTimeout(() => {
+    //     router.replace("/new-account");
+    //   }, 0.250)
+    // }
     
   }, [user, loading, completedSignUp]);
 

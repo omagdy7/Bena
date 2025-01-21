@@ -173,7 +173,7 @@ const ChoosePlacesScreen: React.FC = () => {
         </Animated.Text>
 
         <TabView
-          tabs={['All', 'Bookmarks', 'Suggestions']}
+          tabs={['Suggestions', 'Bookmarks', 'All']}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />

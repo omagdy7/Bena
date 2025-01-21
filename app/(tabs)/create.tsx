@@ -107,7 +107,7 @@ const CreateTrip: React.FC = () => {
       user_id: user?.id,
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
-      status: 'in_progress',
+      status: 'planned',
     };
   
     try {

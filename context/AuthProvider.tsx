@@ -133,10 +133,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signOut = async () => {
     try {
+      router.replace('/')
       const { error } = await supabase.auth.signOut();
       setState(prev => ({ ...prev, completedSignUp: false }));
       if (error) throw error;
-      router.push('/')
     } catch (error) {
       throw error;
     }

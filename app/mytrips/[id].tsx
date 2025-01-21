@@ -21,6 +21,31 @@ const TripTimeline : React.FC = () => {
   const [ status, setStatus ] = useState<'in_progress' | 'planned' | 'completed'>('in_progress');
   const [isCompleted, setIsCompleted] = useState(false);
   const { markAsCompleted, markAsPlanned, deleteTrip }= useAllTrips();
+  const [selectedSteps, setSelectedSteps] = useState<string[]>([]); // Track selected step IDs
+  const [isSwapping, setIsSwapping] = useState(false);
+
+  const handleSwapSteps = async () => {
+    if (selectedSteps.length === 2) {
+      try {
+        await swapSteps(selectedSteps[0], selectedSteps[1]);
+        setSelectedSteps([]);
+        await fetchInProgressTrip(); // Refresh the trip data
+        setIsSwapping(false);
+      } catch (error) {
+        console.log("Error swapping steps:", error);
+      }
+    }
+  };
+
+  if(selectedSteps.length === 2 && !isSwapping) {
+    setIsSwapping(true);
+    // console.log('Selected Steps:', selectedSteps);
+    handleSwapSteps();
+    //timeout to prevent multiple swaps
+    setTimeout(() => {
+      setIsSwapping(false);
+    }, 10000);
+  }
 
   const fetchTrip = async () => {
     try {
@@ -144,9 +169,10 @@ const TripTimeline : React.FC = () => {
           );
       };
   
-      const handleShareTrip = async () => {
-        // TODO: Implement share trip functionality
-      };
+    const handleShareTrip = async () => {
+      router.push(`share/trip/${trip.trip_id}`);
+      // TODO: Implement share trip functionality
+    };
   
       const handleOpenOnMaps = async () => {
         // TODO: Implement open on maps functionality 

@@ -19,13 +19,37 @@ const useAllTrips = () => {
       .order('start_date', { ascending: true }); // Sort trips by start_date
   
     if (tripsError) throw tripsError;
+
+    try {
+      const { data: guestTrips, error: guestTripsError } = await supabase
+        .from('trips_guests')
+        .select(`*,
+          trips: trip_id(*)
+        `)
+        .eq('guest_id', user.id);
+    
+      if (guestTripsError) {
+        throw guestTripsError;
+      }
+    
+      const refinedGuestTrips = guestTrips.map(item => item.trips)
+      refinedGuestTrips.forEach(element => {
+        element.user_id = "guest";
+      });
+      // console.log('Guest trips:', refinedGuestTrips);
+      trips.push(...refinedGuestTrips);
+    } catch (error) {
+      console.error('Error fetching trips by guest:', error);
+    }
   
     // Group trips by status
     const groupedTrips = {
       in_progress: [],
       planned: [],
       completed: [],
+      // guest: [],
     };
+  
   
     // Sort trips into their respective status groups
     trips.forEach((trip) => {
@@ -37,6 +61,9 @@ const useAllTrips = () => {
         groupedTrips.completed.push(trip);
       }
     });
+
+    // groupedTrips.guest.push(guestTrips);
+
   
     // Fetch trip steps and their associated places for each trip
     const tripsWithStepsAndPlaces = await Promise.all(

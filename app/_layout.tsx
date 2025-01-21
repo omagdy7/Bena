@@ -195,8 +195,8 @@ export default function RootLayout() {
             <Stack.Screen name="settings" options={{ headerShown: false }} />
             <Stack.Screen name="history" options={{ headerShown: false }} />
             <Stack.Screen name="home/[id]" options={{ headerShown: false }} />
-            <Stack.Screen name="home/Search" options={{ headerShown: false }} />
             <Stack.Screen name="mytrips/[id]"  options={{ headerShown: false }} />
+            <Stack.Screen name="share/trip/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="editPlace" options={{ headerShown: false }} />
             <Stack.Screen name="choosePlace"
               options={{
