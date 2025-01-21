@@ -66,6 +66,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (mounted) {
           console.log('username:', data[0]?.username);
           console.log('Completed sign up:', data[0]?.username == null ? false : true);
+
+          if (session) {
+            await handleTokenUpdate();
+          }
+          
           setState(prev => ({
             ...prev,
             session,
@@ -90,11 +95,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }));
     });
 
+    
+
     return () => {
       mounted = false;
       subscription?.unsubscribe();
     };
   }, []);
+
+  const handleTokenUpdate = async () => {
+    try {
+      // Refresh the session to ensure tokens are up-to-date
+      const { data, error } = await supabase.auth.refreshSession();
+  
+      if (error) {
+        console.error("Error refreshing session:", error);
+      } else {
+        console.log("Session refreshed:", data);
+      }
+    } catch (error) {
+      console.error("Error updating token:", error);
+    }
+  };
+  
+
 
   const signUp = async ({ email, password }: SignInCredentials) => {
     try {

@@ -20,16 +20,25 @@ const TripTimeline : React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [ status, setStatus ] = useState<'in_progress' | 'planned' | 'completed'>('in_progress');
   const [isCompleted, setIsCompleted] = useState(false);
-  const { markAsCompleted, markAsPlanned, deleteTrip }= useAllTrips();
+  const { markAsCompleted, markAsPlanned, deleteTrip, swapSteps }= useAllTrips();
   const [selectedSteps, setSelectedSteps] = useState<string[]>([]); // Track selected step IDs
   const [isSwapping, setIsSwapping] = useState(false);
+
+
+  const handleStepSelect = (stepId: string) => {
+    setSelectedSteps((prev) => {
+      if (prev.includes(stepId)) {
+        return prev.filter((id) => id !== stepId);
+      }
+      return prev.length < 2 ? [...prev, stepId] : prev; // Allow up to 2 selections
+    });
+  };
 
   const handleSwapSteps = async () => {
     if (selectedSteps.length === 2) {
       try {
         await swapSteps(selectedSteps[0], selectedSteps[1]);
         setSelectedSteps([]);
-        await fetchInProgressTrip(); // Refresh the trip data
         setIsSwapping(false);
       } catch (error) {
         console.log("Error swapping steps:", error);
@@ -39,7 +48,7 @@ const TripTimeline : React.FC = () => {
 
   if(selectedSteps.length === 2 && !isSwapping) {
     setIsSwapping(true);
-    // console.log('Selected Steps:', selectedSteps);
+    console.log('Selected Steps:', selectedSteps);
     handleSwapSteps();
     //timeout to prevent multiple swaps
     setTimeout(() => {
@@ -200,6 +209,16 @@ const TripTimeline : React.FC = () => {
                 <Text className="text-3xl font-bold text-white text-white">{trip.title.length > 20 ? trip.title.slice(0, 20) + '...' : trip.title}</Text>
             </Animated.Text>
         </View>
+        <View className="flex-row items-center ">
+          {isSwapping &&
+            <Animated.View 
+              entering={FadeInDown.duration(500).springify()}
+              className="flex-row items-center px-4">
+                <Ionicons name="swap-vertical-outline" size={10} color="gray" className='pr-2'/>
+                <Text className="text-sm italic text-gray-500">Swapping Steps...</Text>
+            </Animated.View>
+            }
+      </View>
       </View>
       <View className="flex-row items-center px-4">
         <Animated.Text
@@ -272,6 +291,10 @@ const TripTimeline : React.FC = () => {
                   step={step}
                   index={index}
                   onEdit={() => handleEditStep(step.step_id)}
+                  isLast={index === trip.steps.length - 1}
+                  totalSteps={trip.steps.length}
+                  onStepSelect={handleStepSelect}
+                  isSelected={selectedSteps.includes(step.step_id)}
                 />
               </View>
             ))}
