@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Alert, TextInput, ActivityIndicator } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Alert, TextInput, ActivityIndicator, Share, Keyboard } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
@@ -14,6 +14,7 @@ import HomeSkeleton from '@/components/HomeSkeleton';
 import { TextIcon } from 'lucide-react-native';
 import { useGuestTrips } from '@/hooks/useGuestTrips';
 import GuestCard  from '@/components/GuestCard';
+import QRCode from 'react-native-qrcode-svg';
 
 interface FormData {
   username: string
@@ -83,6 +84,7 @@ const TripTimeline : React.FC = () => {
         // TODO: Implement send invitation functionality
         setAddingGuestError('empty');
         setIsAddingGuest(true);
+        Keyboard.dismiss();
 
         try {
         const result = await addGuest(form.username.trim(), id);
@@ -105,6 +107,26 @@ const TripTimeline : React.FC = () => {
           // setAddingGuestError('success');
         }
       }
+
+      const handleShareTrip = async () => {
+        try {
+          const result = await Share.share({
+            message:
+              `http://54.84.91.107/share/trip/${trip.trip_id}`,
+          });
+          if (result.action === Share.sharedAction) {
+            if (result.activityType) {
+              // shared with activity type of result.activityType
+            } else {
+              // shared
+            }
+          } else if (result.action === Share.dismissedAction) {
+            // dismissed
+          }
+        } catch (error: any) {
+          Alert.alert(error.message);
+        }
+      };
 
       const handleDeleteGuest = () => {
         Alert.alert(
@@ -237,6 +259,35 @@ const TripTimeline : React.FC = () => {
         </ScrollView>
       </View>
     </Animated.View>
+    <Animated.View 
+      entering={FadeInDown.duration(500).springify()}
+      className="flex-col items-center p-4 mb-4 mx-4 bg-zinc-800 rounded-lg" >
+        <View className="flex-row items-center rounded-lg  justify-between">
+          <View className=" flex-1 bg-zinc-700 p-2">
+            <Text className="text-white text-sm italic font-light">`http://54.84.91.107/share/trip/${trip.trip_id}`</Text>
+            </View>
+            <TouchableOpacity onPress={handleShareTrip} className="">
+            <Ionicons className='px-8' name="share-outline" size={20} color="white" />
+            </TouchableOpacity>
+            </View>
+            
+    </Animated.View>
+    <Animated.View
+      entering={FadeInDown.duration(500).springify()}
+      className="flex-col items-center p-4 mb-4 mx-4 bg-zinc-800 rounded-lg"
+    >
+      <View className="flex-row items-center rounded-lg  justify-between">
+      <View className="p-4 bg-zinc-700 rounded-lg mt-4">
+              <QRCode
+              value={`http://54.84.91.107/share/trip/${trip.trip_id}`}
+              size={300}
+              logo={require('@/assets/images/logo.png')}
+              logoBackgroundColor='black'
+              logoSize={50}
+              />
+            </View>
+        </View>
+        </Animated.View>
   </SafeAreaView>
   );
 };

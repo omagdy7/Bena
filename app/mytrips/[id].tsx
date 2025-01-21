@@ -57,6 +57,7 @@ const TripTimeline : React.FC = () => {
   }
 
   const fetchTrip = async () => {
+    // console.log(id);
     try {
       // Fetch the trip
       const { data: tripData, error: tripError } = await supabase

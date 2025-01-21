@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, FlatList, TouchableOpacity, Image, Alert  } from 'react-native';
+import { View, FlatList, TouchableOpacity, Image, Alert, Share  } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Text } from '@/components/ui/text';
@@ -90,7 +90,23 @@ const TripCard = ({ trip, index , setSyncing, setSyncedDate  }) => {
   };
 
   const handleShareTrip = async () => {
-    // TODO: Implement share trip functionality
+    try {
+      const result = await Share.share({
+        message:
+          `http://54.84.91.107/share/trip/${trip.trip_id}`,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error: any) {
+      Alert.alert(error.message);
+    }
   };
 
   return (
