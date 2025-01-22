@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthProvider';
 import MapView, { Marker } from 'react-native-maps';
 import { router } from 'expo-router';
 import NearbyCarousal from '@/components/NearbyCarousal';
+import { set } from 'date-fns';
 
 const { width } = Dimensions.get('window');
 
@@ -23,10 +24,9 @@ const PlaceDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [feedback, setFeedback] = useState<'up' | 'down' | 'expensive' | 'affordable' | 'exhausting' | 'relaxing' | null>(null);
-  const [isGoodFeedback, setIsGoodFeedback] = useState<'up' | 'down'| null>(null);
-  const [isCheap, setIsCheap] = useState<'expensive' | 'affordable' | null>(null);
-  const [isEasy, setIsEasy] = useState<'exhausting' | 'relaxing' | null>(null);
+  const [overall, setOverall] = useState< 'empty' | 'above' | 'below'>('empty');
+  const [expense, setExpense] = useState< 'empty' |'cheap' | 'high' >('empty');
+  const [comfort, setComfort] = useState< 'empty' | 'comfortable' | 'exhausting' >('empty');
   const [isExpanded, setIsExpanded] = useState(false);
   const maxDescriptionLength = 150; // Maximum length of description to show before expanding
 
@@ -97,27 +97,27 @@ const PlaceDetails: React.FC = () => {
   }
 
   const handleFeedbackUp = async () => {
-    setIsGoodFeedback('up');
+    setOverall('above');
   };
 
   const handleFeedbackDown = async () => {
-    setIsGoodFeedback('down');
+    setOverall('below');
   };
 
   const handleFeedbackExpensive = async () => {
-    setIsCheap('expensive');
+    setExpense('high');
   };
 
   const handleFeedbackAffordable = async () => {
-    setIsCheap('affordable');
+    setExpense('cheap');
   };
 
   const handleFeedbackRelaxing = async () => {
-    setIsEasy('relaxing');
+    setComfort('comfortable');
   };
 
   const handleFeedbackExhausting = async () => {
-    setIsEasy('exhausting');
+    setComfort('exhausting');
   };
 
   const handleClickOnLocation = async () => { 
@@ -292,14 +292,14 @@ const PlaceDetails: React.FC = () => {
               style={{ width: 145 }}
               onPress={handleFeedbackUp}
               className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                isGoodFeedback === 'up' ? 'bg-blue-400' : 'bg-white'
+                overall === 'above' ? 'bg-blue-400' : 'bg-white'
               }`}
             >
-              <Text className={`mr-2 text-sm font-bold ${isGoodFeedback === 'up' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Amazing</Text>
+              <Text className={`mr-2 text-sm font-bold ${overall === 'above' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Amazing</Text>
               <Ionicons
-                name={isGoodFeedback === 'up' ? 'thumbs-up' : 'thumbs-up-outline'}
+                name={overall === 'above' ? 'thumbs-up' : 'thumbs-up-outline'}
                 size={18}
-                color={isGoodFeedback === 'up' ? '#18181b' : '#18181b'}
+                color={overall === 'above' ? '#18181b' : '#18181b'}
               />
             </TouchableOpacity>
 
@@ -307,16 +307,16 @@ const PlaceDetails: React.FC = () => {
               style={{ width: 145 }}
               onPress={handleFeedbackDown}
               className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                isGoodFeedback === 'down' ? 'bg-red-400' : 'bg-white'
+                overall === 'below' ? 'bg-red-400' : 'bg-white'
               }`}
             >
               
               <Ionicons
-                name={isGoodFeedback === 'down' ? 'thumbs-down' : 'thumbs-down-outline'}
+                name={overall === 'below' ? 'thumbs-down' : 'thumbs-down-outline'}
                 size={18}
-                color={isGoodFeedback === 'down' ? '#18181b' : '#18181b'}
+                color={overall === 'below' ? '#18181b' : '#18181b'}
               />
-              <Text className={`ml-2 text-sm font-bold ${isGoodFeedback === 'down' ? 'text-zinc-900' : 'text-zinc-800'}`}>Below Expectations</Text>
+              <Text className={`ml-2 text-sm font-bold ${overall === 'below' ? 'text-zinc-900' : 'text-zinc-800'}`}>Below Expectations</Text>
             </TouchableOpacity>
           </View>
 
@@ -327,12 +327,12 @@ const PlaceDetails: React.FC = () => {
             style={{ width: 145 }}
               onPress={handleFeedbackAffordable}
               className={`p-2 rounded-lg mx-4 flex-row items-center ${
-                isCheap === 'affordable' ? 'bg-orange-400' : 'bg-white'
+                expense === 'cheap' ? 'bg-orange-400' : 'bg-white'
               }`}
             >
-              <Text className={`mr-2 text-sm font-bold ${isCheap === 'affordable' ? 'text-zinc-900' : 'text-zinc-800'}`} >Cheaper than Expect</Text>
+              <Text className={`mr-2 text-sm font-bold ${expense === 'cheap' ? 'text-zinc-900' : 'text-zinc-800'}`} >Cheaper than Expect</Text>
               <Ionicons
-                name={isCheap === 'affordable' ? 'flame' : 'flame-outline'}
+                name={expense === 'cheap' ? 'flame' : 'flame-outline'}
                 size={18}
                 color="#18181b"
               />
@@ -342,15 +342,15 @@ const PlaceDetails: React.FC = () => {
               style={{ width: 145 }}
               onPress={handleFeedbackExpensive}
               className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                isCheap === 'expensive' ? 'bg-yellow-400' : 'bg-white'
+                expense === 'high' ? 'bg-yellow-400' : 'bg-white'
               }`}
             >
               <Ionicons
-                name={isCheap === 'expensive' ? 'cash' : 'cash-outline'}
+                name={expense === 'high' ? 'cash' : 'cash-outline'}
                 size={18}
                 color="#18181b"
               />
-              <Text className={`ml-2 text-sm font-bold ${isCheap === 'expensive' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Expensive</Text>
+              <Text className={`ml-2 text-sm font-bold ${expense === 'high' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Expensive</Text>
             </TouchableOpacity>
           </View>
 
@@ -361,13 +361,13 @@ const PlaceDetails: React.FC = () => {
               style={{ width: 145 }}
               onPress={handleFeedbackRelaxing}
               className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                isEasy === 'relaxing' ? 'bg-green-400' : 'bg-white'
+                comfort === 'comfortable' ? 'bg-green-400' : 'bg-white'
               }`}
             >
               
-              <Text className={`mr-2 text-sm font-bold ${isEasy === 'relaxing' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Relaxing</Text>
+              <Text className={`mr-2 text-sm font-bold ${comfort === 'comfortable' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Relaxing</Text>
               <Ionicons
-                name={isEasy === 'relaxing' ? 'leaf' : 'leaf-outline'}
+                name={comfort === 'comfortable' ? 'leaf' : 'leaf-outline'}
                 size={18}
                 color="#18181b"
               />
@@ -377,15 +377,15 @@ const PlaceDetails: React.FC = () => {
               style={{ width: 145 }}
               onPress={handleFeedbackExhausting}
               className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                isEasy === 'exhausting' ? 'bg-gray-400' : 'bg-white'
+                comfort === 'exhausting' ? 'bg-gray-400' : 'bg-white'
               }`}
             >
               <Ionicons
-                name={isEasy === 'exhausting' ? 'battery-dead' : 'battery-dead-outline'}
+                name={comfort === 'exhausting' ? 'battery-dead' : 'battery-dead-outline'}
                 size={18}
                 color="#18181b"
               />
-              <Text className={`ml-2 text-sm font-bold ${isEasy === 'exhausting' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Exhausting</Text>
+              <Text className={`ml-2 text-sm font-bold ${comfort === 'exhausting' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Exhausting</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
