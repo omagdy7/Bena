@@ -13,6 +13,10 @@ import MapView, { Marker } from 'react-native-maps';
 import { router } from 'expo-router';
 import NearbyCarousal from '@/components/NearbyCarousal';
 import { set } from 'date-fns';
+import { usePlaceInteraction } from '@/hooks/usePlaceInteraction';
+import { useSearchPlace } from '@/hooks/useSearchPlace';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+
 
 const { width } = Dimensions.get('window');
 
@@ -29,35 +33,125 @@ const PlaceDetails: React.FC = () => {
   const [comfort, setComfort] = useState< 'empty' | 'comfortable' | 'exhausting' >('empty');
   const [isExpanded, setIsExpanded] = useState(false);
   const maxDescriptionLength = 150; // Maximum length of description to show before expanding
+  const { interactions, getInteractions, updateOverall, updateExpense, updateComfort, fetchCounts, refetch } = usePlaceInteraction(id);
+  const [intialRefresh, setInitialRefresh] = useState(0);
+  const { getNearbyPlaces } = useSearchPlace();
+  // const [nearbyPlaces, setNearbyPlaces] = useState<Place[]>([]);
+  const [ratings, setRatings] = useState<'average' | 'good' | 'amazing' >('good');
+  const [price, setPrice] = useState<'average' | 'cheap' | 'expensive' >('average');
+  const [comfortness, setComfortness] = useState<'average' | 'comfortable' | 'exhausting' >('average');
+
 
   
+  
+  const SEARCH_RADIUS = 2;
+  
+  const checkBookmarkStatus = async () => {
+    // const nearbyPlaces = await getNearbyPlaces(id,SEARCH_RADIUS);
+    // setNearbyPlaces(nearbyPlaces.near_places);
+    if (!user || !id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('bookmarks')
+        .select('bookmark_id')
+        .eq('place_id', id)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+        // console.log(data);
+
+      if (error) throw error;
+      setIsBookmarked(!!data);
+      // console.log(data);
+    } catch (err) {
+      console.error('Error checking bookmark status:', err);
+    }
+  };
+
+  const fetchInteractions = async () => {
+    try {
+      const InteractionsCouts = await fetchCounts();
+      // console.log(InteractionsCouts);
+      if(InteractionsCouts.countHigh > InteractionsCouts.countCheap) {
+        setPrice('expensive');
+      }
+      else if(InteractionsCouts.countHigh < InteractionsCouts.countCheap) {
+        setPrice('cheap');
+      }
+      else {
+        setPrice('average');
+      }
+
+      if(InteractionsCouts.countComfortable > InteractionsCouts.countExhausting) {
+        setComfortness('comfortable');
+      }
+      else if(InteractionsCouts.countComfortable < InteractionsCouts.countExhausting) {
+        setComfortness('exhausting');
+      }
+      else {
+        setComfortness('average');
+      }
+
+      if(InteractionsCouts.countAbove > InteractionsCouts.countBelow) {
+        setRatings('amazing');
+      }
+      else if(InteractionsCouts.countAbove < InteractionsCouts.countBelow) {
+        setRatings('average');
+      }
+      else {
+        setRatings('good');
+      }
+      
+    } catch (error) {
+      console.error('Error fetching interactions:', error);
+    }
+  };
 
 
+  // try {
+  //   const currentinteractions = interactions[0];
+  //   if (intialRefresh < 4) {
+
+  //     if(!currentinteractions) {
+  //       setOverall('empty');
+  //       setExpense('empty');
+  //       setComfort('empty');  
+  //     }
+  //     else{
+  //       setOverall(currentinteractions.overall);
+  //       setExpense(currentinteractions.expense);
+  //       setComfort(currentinteractions.comfort);
+  //       // checkBookmarkStatus();
+  //     }
+  //     setInitialRefresh(intialRefresh+1);
+  // }
+  // } catch (error) {
+  //   console.error('Error fetching interactions:', error);
+  // }
 
 
+  const fetchUserInteractions = async () => {
+    try {
+      await refetch();
+    } catch (error) {
+      console.error('Error fetching interactions:', error);
+    } finally {
+      setOverall(interactions[0]?.overall || 'empty');
+      setExpense(interactions[0]?.expense || 'empty');
+      setComfort(interactions[0]?.comfort || 'empty');
+
+    }
+  };
+
+  fetchUserInteractions();
   // Check if place is bookmarked on component mount
   useEffect(() => {
-    const checkBookmarkStatus = async () => {
-      const nearbyPlaces = await getNearbyPlaces(id,SEARCH_RADIUS);
-      setNearbyPlaces(nearbyPlaces.near_places);
-      if (!user || !id) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('bookmarks')
-          .select('bookmark_id')
-          .eq('place_id', id)
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (error) throw error;
-        setIsBookmarked(!!data);
-      } catch (err) {
-        console.error('Error checking bookmark status:', err);
-      }
-    };
+    
 
     checkBookmarkStatus();
+    fetchInteractions();
+    fetchUserInteractions();
   }, [user, id]);
 
   const handleBookmark = async () => {
@@ -98,26 +192,32 @@ const PlaceDetails: React.FC = () => {
 
   const handleFeedbackUp = async () => {
     setOverall('above');
+    updateOverall('above');
   };
 
   const handleFeedbackDown = async () => {
     setOverall('below');
+    updateOverall('below');
   };
 
   const handleFeedbackExpensive = async () => {
     setExpense('high');
+    updateExpense('high');
   };
 
   const handleFeedbackAffordable = async () => {
     setExpense('cheap');
+    updateExpense('cheap');
   };
 
   const handleFeedbackRelaxing = async () => {
     setComfort('comfortable');
+    updateComfort('comfortable');
   };
 
   const handleFeedbackExhausting = async () => {
     setComfort('exhausting');
+    updateComfort('exhausting');
   };
 
   const handleClickOnLocation = async () => { 
@@ -197,6 +297,13 @@ const PlaceDetails: React.FC = () => {
     );
   }
 
+  if (!place) {
+    return (
+      <View className="flex-1 items-center justify-center bg-zinc-900">
+        <Text className="text-red-500 text-center">No place found</Text>
+      </View>
+    );
+  }
   if (error) {
     return (
       <View className="flex-1 items-center justify-center bg-zinc-900">
@@ -254,7 +361,7 @@ const PlaceDetails: React.FC = () => {
                 : <Ionicons name="bookmark" size={25} color="#fcbf49" />
             }
           </TouchableOpacity>
-      </View>``
+      </View>
       
       <Animated.View entering={FadeInUp.delay(300).duration(500)} className="p-6">
         <Animated.Text entering={FadeInDown.delay(400).duration(500)} className="text-4xl font-bold text-white width-full mb-2 flex-row justify-between items-center"><Text className="mr-4">{place?.name}</Text>
@@ -271,6 +378,21 @@ const PlaceDetails: React.FC = () => {
           <Text className="text-gray-300 ml-1" style={{fontSize: 12}}>{place?.category}</Text>
           </TouchableOpacity>
         </Animated.View>
+        <Animated.View entering={FadeInDown.delay(500).duration(500)} className="flex-row items-center mb-4 ">
+          <TouchableOpacity className=" py-1 px-2 mr-2 rounded-full flex-row items-center gap-2"> 
+            <Ionicons name={ratings === "good" ? "thumbs-up" : ratings === "average" ? "thumbs-down-outline" : "star"} size={14} color="#e3e3e3" />
+            <Text className="text-[#e3e3e3]"  style={{fontSize: 12}}>{ratings === "good" ? "Good place" : ratings === "average" ? "Average place" : "Amazing place"}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className=" py-1 px-2 mr-2 rounded-full flex-row items-center gap-2"> 
+            <Ionicons name="card" size={14} color="#e3e3e3" />
+            <Text className="text-[#e3e3e3]"  style={{fontSize: 12}}>{price === 'average' ? "Average prices" : price === 'cheap' ? "Cheap prices" : "Expensive prices"}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className=" py-1 px-2 mr-2 rounded-full flex-row items-center gap-2"> 
+            <Ionicons name="walk" size={14} color="#e3e3e3" />
+            <Text className="text-[#e3e3e3]"  style={{fontSize: 12}}>{comfortness === 'average' ? "Not much effort" : comfortness === 'comfortable' ? "Easy trip" : "Takes some effort"}</Text>
+          </TouchableOpacity>
+        </Animated.View>
+        
 
         { !(description === 'No description yet') && <TouchableOpacity onPress={toggleExpanded} >
           <Animated.Text

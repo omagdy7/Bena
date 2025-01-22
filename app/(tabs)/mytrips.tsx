@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, FlatList, TouchableOpacity, Image, Alert, Share  } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -248,6 +248,10 @@ const AllTrips = () => {
     const [isSyncing, setSyncing] = useState<boolean>(false);
     const [syncedDate, setSyncedDate] = useState<Date | null>(new Date());
 
+useEffect(() => {
+    refetch();
+  }, []);
+
 
     const handleRefresh = useCallback(async () => {
         setRefreshing(true);
@@ -267,7 +271,7 @@ const AllTrips = () => {
     );
   }
 
-  if (trips.length === 0) {
+  if (!trips || trips.length === 0) {
     return (
       <SafeAreaView className="flex-1 bg-zinc-900 justify-center items-center">
         <StatusBar style="light" />

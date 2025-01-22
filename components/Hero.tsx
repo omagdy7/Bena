@@ -37,7 +37,7 @@ export const Hero: React.FC = () => (
           entering={FadeInDown.delay(500).springify()}
           className="flex-row mt-4"
         >
-          <TouchableOpacity className="bg-secondary py-3 px-6 rounded-full mr-4">
+          <TouchableOpacity className="bg-[#fcbf49] py-3 px-6 rounded-full mr-4">
             <Text className="text-zinc-900 font-bold">Explore Now</Text>
           </TouchableOpacity>
           <TouchableOpacity className="bg-zinc-800 py-3 px-6 rounded-full">
