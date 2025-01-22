@@ -64,8 +64,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (error) throw error;
 
         if (mounted) {
-          console.log('username:', data[0]?.username);
-          console.log('Completed sign up:', data[0]?.username == null ? false : true);
+          // console.log('username:', data[0]?.username);
+          // console.log('Completed sign up:', data[0]?.username == null ? false : true);
 
           if (session) {
             await handleTokenUpdate();
@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) {
         console.error("Error refreshing session:", error);
       } else {
-        console.log("Session refreshed:", data);
+        // console.log("Session refreshed:", data);
       }
     } catch (error) {
       console.error("Error updating token:", error);

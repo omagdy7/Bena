@@ -180,8 +180,7 @@ const TripTimeline : React.FC = () => {
       };
   
     const handleShareTrip = async () => {
-      router.push(`share/trip/${trip.trip_id}`);
-      // TODO: Implement share trip functionality
+      router.push(`share/trip/${trip.trip_id}`); 
     };
   
       const handleOpenOnMaps = async () => {

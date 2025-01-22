@@ -267,7 +267,16 @@ const AllTrips = () => {
     );
   }
 
-  if (isError || !trips || !trips.length) {
+  if (trips.length === 0) {
+    return (
+      <SafeAreaView className="flex-1 bg-zinc-900 justify-center items-center">
+        <StatusBar style="light" />
+        <Text className="text-white">No trips found.</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (isError ) {
     return (
       <SafeAreaView className="flex-1 bg-zinc-900 justify-center items-center">
         <StatusBar style="light" />

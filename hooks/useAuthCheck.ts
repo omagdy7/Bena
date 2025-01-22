@@ -8,7 +8,7 @@ export const useAuthCheck = () => {
 
   useEffect(() => {
     if (!user) {
-      router.replace('/sign-in');
+      router.replace('/');
     }
   }, [user]);
 
