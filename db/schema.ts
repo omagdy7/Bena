@@ -54,4 +54,20 @@ interface TripStep {
   status: 'pending' | 'in_progress' | 'visited' | 'skipped';
 }
 
-export { Place, Users, Bookmarks, Trips, TripStep }
+interface TripsGuests {
+  id: string;
+  trip_id: string;
+  guest_id: string;
+  status: 'pending' | 'accepted' | 'rejected';
+}
+
+interface PlaceUserInteractions {
+  id: string;
+  place_id: string;
+  user_id: string;
+  overall: 'empty' | 'above' | 'below';
+  expensiveness: 'empty' | 'cheap' | 'high';
+  comfort: 'empty' | 'comfortable' | 'exhausting';
+}
+
+export { Place, Users, Bookmarks, Trips, TripStep, PlaceUserInteractions };
