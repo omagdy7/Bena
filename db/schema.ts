@@ -66,7 +66,7 @@ interface PlaceUserInteractions {
   place_id: string;
   user_id: string;
   overall: 'empty' | 'above' | 'below';
-  expensiveness: 'empty' | 'cheap' | 'high';
+  expense: 'empty' | 'cheap' | 'high';
   comfort: 'empty' | 'comfortable' | 'exhausting';
 }
 
