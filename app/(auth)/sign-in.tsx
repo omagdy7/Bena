@@ -173,26 +173,19 @@ const SignIn = () => {
           </TouchableOpacity>
           
         </View>
-        <View style={styles.progressContainer}>
-          <View style={[styles.progressBar,{ backgroundColor: `hsl(${passwordStrength}, 100%, 50%)`}, { width: `${passwordStrength}%` }]} />
-        </View>
-        {passwordRules.map((rule) => (
-          passwordErrors.includes(rule.label) && <Text
-            key={rule.label}
-            style={[
-              styles.rule,
-              !passwordErrors.includes(rule.label) ? styles.validRule : styles.invalidRule,
-            ]}
-          >
-            {rule.label}
-          </Text>
-        ))}
+       
 
         <TouchableOpacity>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignUp} isLoading={isSubmitting} />
+        <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignIn} isLoading={isSubmitting} />
+        <Link href="/sign-up" style={styles.footer}>
+          <Text style={styles.footerText}>
+            Don't have an account?{' '}
+            <Text style={styles.signUpText}>Sign Up</Text>
+          </Text>
+        </Link>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -260,10 +253,12 @@ const styles = StyleSheet.create({
     color: '#3B82F6',
     textAlign: 'right',
     marginBottom: 20,
+    marginTop: 12,
   },
   footer: {
     alignItems: 'center',
     marginTop: 20,
+    textAlign: 'center',
   },
   footerText: {
     color: '#9CA3AF',
