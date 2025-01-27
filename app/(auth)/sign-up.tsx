@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, Image, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, Image, TouchableOpacity, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { images } from '@/constants'
 import FormField from '@/components/FormField'
@@ -16,6 +16,7 @@ interface FormData {
   password: string
 }
 
+
 const SignUp = () => {
   const { signUp } = useAuth()
   const [form, setForm] = useState<FormData>({
@@ -24,6 +25,30 @@ const SignUp = () => {
     password: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const passwordRules = [
+    { regex: /.{8,}/, label: 'At least 8 characters' },
+    { regex: /[A-Z]/, label: 'At least 1 uppercase letter' },
+    { regex: /[a-z]/, label: 'At least 1 lowercase letter' },
+    { regex: /\d/, label: 'At least 1 number' },
+    { regex: /[@$!%*?&]/, label: 'At least 1 special character (@, $, !, %, *, ?, &)' },
+  ];
+
+  const validatePassword = (password: string) => {
+    const errors = passwordRules
+      .filter((rule) => !rule.regex.test(password))
+      .map((rule) => rule.label);
+    setPasswordErrors(errors);
+    setPasswordStrength(((passwordRules.length - errors.length) / passwordRules.length) * 100);
+  };
+  
+  const handlePasswordChange = (password: string) => {
+    setForm({ ...form, password });
+    validatePassword(password);
+  };
+  
+  
 
   const validateForm = (): boolean => {
     if (!form.username || !form.email || !form.password) {
@@ -136,9 +161,24 @@ const SignUp = () => {
           <FormField
             title="Password"
             value={form.password}
-            handleChangeText={(e) => setForm({ ...form, password: e })}
+            handleChangeText={handlePasswordChange}
           // icon={<Ionicons name="lock-closed-outline" size={20} color="#A1A1AA" />}
           />
+
+          <View style={styles.progressContainer}>
+            <View style={[styles.progressBar,{ backgroundColor: `hsl(${passwordStrength}, 100%, 50%)`}, { width: `${passwordStrength}%` }]} />
+          </View>
+          {passwordRules.map((rule) => (
+            passwordErrors.includes(rule.label) && <Text
+              key={rule.label}
+              style={[
+                styles.rule,
+                !passwordErrors.includes(rule.label) ? styles.validRule : styles.invalidRule,
+              ]}
+            >
+              {rule.label}
+            </Text>
+          ))}
 
           <CustomButton
             title="Sign Up"
@@ -173,6 +213,96 @@ const SignUp = () => {
     </SafeAreaView>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  inner: {
+    flex: 1,
+    paddingHorizontal: 30,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  logo: {
+    width: 96,
+    height: 96,
+  },
+  welcomeText: {
+    color: '#A1A1AA',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  welcomeHighlight: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  input: {
+    backgroundColor: '#374151',
+    color: '#FFFFFF',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#374151',
+  },
+  errorBorder: {
+    borderColor: '#EF9999',
+  },
+  progressContainer: {
+    height: 8,
+    backgroundColor: '#374151',
+    borderRadius: 4,
+    marginVertical: 8,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+  },
+  rule: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  validRule: {
+    color: '#ffffff',
+  },
+  invalidRule: {
+    color: '#EF9999',
+  },
+  forgotPassword: {
+    color: '#3B82F6',
+    textAlign: 'right',
+    marginBottom: 20,
+    marginTop: 12,
+  },
+  footer: {
+    alignItems: 'center',
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  footerText: {
+    color: '#9CA3AF',
+  },
+  signUpText: {
+    color: '#3B82F6',
+    fontWeight: 'bold',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#374151',
+    borderRadius: 8,
+    marginBottom: 0,
+    borderWidth: 1,
+    borderColor: '#374151',
+  },
+  eyeIcon: { marginRight: 8, paddingHorizontal: 12 },
+  submitButton: {
+    marginTop: 16,
+  }
+});
 
 export default SignUp
 

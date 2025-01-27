@@ -189,8 +189,21 @@ const SignIn = () => {
           <TouchableOpacity>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
+          
+        </View>
+       
 
-          <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignUp} isLoading={isSubmitting} />
+        <TouchableOpacity>
+          <Text style={styles.forgotPassword}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignIn} isLoading={isSubmitting} />
+        <Link href="/sign-up" style={styles.footer}>
+          <Text style={styles.footerText}>
+            Don't have an account?{' '}
+            <Text style={styles.signUpText}>Sign Up</Text>
+          </Text>
+        </Link>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -258,10 +271,12 @@ const styles = StyleSheet.create({
     color: '#3B82F6',
     textAlign: 'right',
     marginBottom: 20,
+    marginTop: 12,
   },
   footer: {
     alignItems: 'center',
     marginTop: 20,
+    textAlign: 'center',
   },
   footerText: {
     color: '#9CA3AF',
