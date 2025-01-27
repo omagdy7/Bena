@@ -16,7 +16,7 @@ export default function App() {
 
   useEffect(() => {
     console.log('Completed sign up index:', completedSignUp);
-    if (!loading && user && completedSignUp) {
+    if (!loading && user) {
       setTimeout(() => {
         router.replace("/home");
       }, 0.250)
