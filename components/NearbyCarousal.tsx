@@ -7,14 +7,13 @@ import { useSearchPlace } from '@/hooks/useSearchPlace';
 import React, { useEffect, useState } from 'react';
 
 interface NearbyCarousalProps {
-    mainPlaceId: string;
-  }
+  mainPlaceId: string;
+}
 
 export default function NearbyCarousal({ mainPlaceId }: NearbyCarousalProps) {
   const router = useRouter();
-  const {getNearbyPlaces} = useSearchPlace();
+  const { getNearbyPlaces } = useSearchPlace();
   const [nearbyPlaces, setNearbyPlaces] = useState<[]>([]);
-  const [isMapVisible, setIsMapVisible] = useState(false);
   const SEARCH_RADIUS = 2;
 
   useEffect(() => {
@@ -31,7 +30,7 @@ export default function NearbyCarousal({ mainPlaceId }: NearbyCarousalProps) {
     router.push(`/home/${placeId}`);
   };
 
-if (!nearbyPlaces?.length) {
+  if (!nearbyPlaces?.length) {
     return null; // Or render a "No recommendations" message
   }
 

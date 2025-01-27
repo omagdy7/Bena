@@ -11,7 +11,6 @@ import { BlurView } from 'expo-blur';
 import { usePlaces } from '@/hooks/usePlaces';
 import { useUserBookmarks } from '@/hooks/useUserBookmarks';
 import { useRecommendations } from '@/hooks/useRecommendations';
-import { FlashList } from '@shopify/flash-list';
 import { router } from 'expo-router';
 
 interface Place {

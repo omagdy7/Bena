@@ -15,7 +15,7 @@ interface FormData {
 }
 
 const NewAccount = () => {
-  const { user, completedSignUp, setCompletedSignUp } = useAuth()
+  const { user, completedSignUp } = useAuth()
   if (!user) {
     router.replace('../index');
   }
@@ -52,15 +52,14 @@ const NewAccount = () => {
         setUserNameAlreadyExists(true);
         setIsSubmitting(false);
         return;
-        throw dbError;
       }
       setUserNameAlreadyExists(true);
       // setCompletedSignUp();
       router.replace('/home');
     }
-    
+
     setIsSubmitting(false);
-    };
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-zinc-900">
@@ -72,20 +71,20 @@ const NewAccount = () => {
           <View className="flex-col items-center justify-center gap-6 ">
             {/* <Ionicons name="planet" size={40} color="#fcbf49" /> */}
             <Text className="text-gray-400 text-4xl font-bold text-center">
-              Welcome, get ready to explore the world with us 
+              Welcome, get ready to explore the world with us
             </Text>
-            </View>
-            <View className="flex-row bg-zinc-800 p-2 rounded-full items-center justify-between gap-2">
-              <View className="h-16 px-4 rounded-full border-white  flex-1">
-            <TextInput
-              placeholder="Choose Your Username"
-              value={form.username}
-              onChangeText={(text) => setForm({ ...form, username: text })}
-              className="flex-1 text-white font-psemibold text-base"
-              placeholderTextColor="#a1a1aa"
-              autoCapitalize='none'
+          </View>
+          <View className="flex-row bg-zinc-800 p-2 rounded-full items-center justify-between gap-2">
+            <View className="h-16 px-4 rounded-full border-white  flex-1">
+              <TextInput
+                placeholder="Choose Your Username"
+                value={form.username}
+                onChangeText={(text) => setForm({ ...form, username: text })}
+                className="flex-1 text-white font-psemibold text-base"
+                placeholderTextColor="#a1a1aa"
+                autoCapitalize='none'
 
-            />
+              />
             </View>
 
             <TouchableOpacity onPress={handleSignUp} className="bg-amber-800 p-4 rounded-full">
@@ -96,9 +95,9 @@ const NewAccount = () => {
               )}
             </TouchableOpacity>
           </View>
-          {userNameAlreadyExists && 
-          <View className="flex-row w-full items-center justify-center">
-            <Text className="text-red-400 text-sm absolute ">Username already exists choose another one
+          {userNameAlreadyExists &&
+            <View className="flex-row w-full items-center justify-center">
+              <Text className="text-red-400 text-sm absolute ">Username already exists choose another one
               </Text>
             </View>}
         </View>

@@ -154,7 +154,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw error;
     }
   };
-  
+
 
   const value: AuthContextType = {
     ...state,
@@ -173,4 +173,3 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 };
 
 export default AuthProvider;
-

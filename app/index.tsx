@@ -9,20 +9,10 @@ import { useAuth } from '@/context/AuthProvider';
 import { Text } from '@/components/ui/text';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import {useUser} from '@/hooks/useUser';
-
 const { width } = Dimensions.get('window');
 
 export default function App() {
   const { user, loading, completedSignUp } = useAuth();
-  
-  const { profile } = useUser(user?.id);
-  const [notNullUserNames, setNotNullUserNames] = React.useState(false);
-
-  const checkUserNames = async () => {
-    const result = await checkNullUserNames();
-    setNotNullUserNames(result);
-  };
 
   useEffect(() => {
     console.log('Completed sign up index:', completedSignUp);
@@ -31,12 +21,7 @@ export default function App() {
         router.replace("/home");
       }, 0.250)
     }
-    // } else if(!loading && user) {
-    //   setTimeout(() => {
-    //     router.replace("/new-account");
-    //   }, 0.250)
-    // }
-    
+
   }, [user, loading, completedSignUp]);
 
   // Show a loader or splash screen while checking for the session

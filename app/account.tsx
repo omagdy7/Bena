@@ -50,7 +50,7 @@ export default function Account() {
   return (
     <LinearGradient
       colors={['#1a202c', '#2d3748']}
-      className="flex-1 mb-32 mt-8"
+      className="flex-1 mb-12 mt-8"
     >
       <Animated.View className="flex-1 bg-black px-6 py-4">
         {/* Header */}

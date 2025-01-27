@@ -12,11 +12,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '@/constants';
 import CustomButton from '@/components/CustomButton';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useAuth } from '@/context/AuthProvider';
 import { Ionicons } from '@expo/vector-icons';
-import { supabase } from '@/lib/supabase';
-import Toast from 'react-native-toast-message';
 
 interface FormData {
   email: string;
@@ -107,26 +105,26 @@ const SignIn = () => {
   };
 
   const handleSignUp = async () => {
-      if (!validateForm()) return;
-      setIsSubmitting(true);
-      console.log('signing up');
-      try {
-        const { user } = await signUp({
-          email: form.email.trim(),
-          password: form.password,
-        });
-  
-        if (user) {
-          router.replace('/new-account');
-        }
-      } catch (error) {
-        if (error.message.includes('User already registered')){
-          await handleSignIn();
-        }
-      } finally {
-        setIsSubmitting(false);
+    if (!validateForm()) return;
+    setIsSubmitting(true);
+    console.log('signing up');
+    try {
+      const { user } = await signUp({
+        email: form.email.trim(),
+        password: form.password,
+      });
+
+      if (user) {
+        router.replace('/new-account');
       }
-    };
+    } catch (error) {
+      if (error.message.includes('User already registered')) {
+        await handleSignIn();
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container} className='bg-zinc-900'>
@@ -135,64 +133,64 @@ const SignIn = () => {
         style={styles.inner}
       >
         <View className='flex-1 justify-center '>
-        <View style={styles.header}>
-          <Image source={images.logo} style={styles.logo} resizeMode="contain" />
-          <Text style={styles.welcomeText}>
-            <Text style={styles.welcomeHighlight}>Welcome to Bena</Text> – Plan, Explore, and Experience Like Never Before!
-          </Text>
-        </View>
+          <View style={styles.header}>
+            <Image source={images.logo} style={styles.logo} resizeMode="contain" />
+            <Text style={styles.welcomeText}>
+              <Text style={styles.welcomeHighlight}>Welcome to Bena</Text> – Plan, Explore, and Experience Like Never Before!
+            </Text>
+          </View>
 
-        <TextInput
-          style={[styles.input,{marginBottom: 16}, emailError === 'empty' && styles.errorBorder, emailError === 'wrong_format' && styles.errorBorder]}
-          placeholder="Email"
-          placeholderTextColor="#A1A1AA"
-          value={form.email}
-          onChangeText={(e) => setForm({ ...form, email: e })}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-         <View style={[styles.passwordContainer, passwordError === 'empty' && styles.errorBorder ]} className='flex-row items-center justify-between'>
           <TextInput
-            style={[styles.input, {flex:1}]}
-            placeholder="Password"
+            style={[styles.input, { marginBottom: 16 }, emailError === 'empty' && styles.errorBorder, emailError === 'wrong_format' && styles.errorBorder]}
+            placeholder="Email"
             placeholderTextColor="#A1A1AA"
-            value={form.password}
-            onChangeText={handlePasswordChange}
-            secureTextEntry={!showPassword} 
+            value={form.email}
+            onChangeText={(e) => setForm({ ...form, email: e })}
+            keyboardType="email-address"
             autoCapitalize="none"
           />
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            style={styles.eyeIcon}
-          >
-            <Ionicons
-              name={showPassword ? 'eye-off' : 'eye'}
-              size={18}
-              color="#A1A1AA"
+          <View style={[styles.passwordContainer, passwordError === 'empty' && styles.errorBorder]} className='flex-row items-center justify-between'>
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              placeholder="Password"
+              placeholderTextColor="#A1A1AA"
+              value={form.password}
+              onChangeText={handlePasswordChange}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
             />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+            >
+              <Ionicons
+                name={showPassword ? 'eye-off' : 'eye'}
+                size={18}
+                color="#A1A1AA"
+              />
+            </TouchableOpacity>
+
+          </View>
+          <View style={styles.progressContainer}>
+            <View style={[styles.progressBar, { backgroundColor: `hsl(${passwordStrength}, 100%, 50%)` }, { width: `${passwordStrength}%` }]} />
+          </View>
+          {passwordRules.map((rule) => (
+            passwordErrors.includes(rule.label) && <Text
+              key={rule.label}
+              style={[
+                styles.rule,
+                !passwordErrors.includes(rule.label) ? styles.validRule : styles.invalidRule,
+              ]}
+            >
+              {rule.label}
+            </Text>
+          ))}
+
+          <TouchableOpacity>
+            <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
-          
-        </View>
-        <View style={styles.progressContainer}>
-          <View style={[styles.progressBar,{ backgroundColor: `hsl(${passwordStrength}, 100%, 50%)`}, { width: `${passwordStrength}%` }]} />
-        </View>
-        {passwordRules.map((rule) => (
-          passwordErrors.includes(rule.label) && <Text
-            key={rule.label}
-            style={[
-              styles.rule,
-              !passwordErrors.includes(rule.label) ? styles.validRule : styles.invalidRule,
-            ]}
-          >
-            {rule.label}
-          </Text>
-        ))}
 
-        <TouchableOpacity>
-          <Text style={styles.forgotPassword}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignUp} isLoading={isSubmitting} />
+          <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignUp} isLoading={isSubmitting} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

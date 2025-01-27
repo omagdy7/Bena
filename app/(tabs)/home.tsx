@@ -21,9 +21,6 @@ import RecommendationCarousel from '@/components/RecommendationCarousel';
 import { PlaceSubset } from '@/hooks/useCategoricalPlaces';
 import { Hero } from '@/components/Hero';
 import { StatusBar } from 'expo-status-bar';
-import { useAuth } from '@/context/AuthProvider';
-import { useUser } from '@/hooks/useUser';
-
 
 const { height } = Dimensions.get('window');
 const HEADER_HEIGHT = height * 0.4;
@@ -36,8 +33,6 @@ const HomeContent: React.FC = () => {
   const router = useRouter();
   const scrollY = useSharedValue(0);
 
-  
-  
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -67,12 +62,12 @@ const HomeContent: React.FC = () => {
       [0, 1], // Adjusts the alpha from 0 to 1
       Extrapolate.CLAMP
     );
-  
+
     return {
-      backgroundColor: `rgba(17, 17, 17, ${backgroundOpacity})`, 
+      backgroundColor: `rgba(17, 17, 17, ${backgroundOpacity})`,
     };
   });
-  
+
 
   if (error) {
     return (
@@ -84,13 +79,13 @@ const HomeContent: React.FC = () => {
 
   const renderListHeader = () => (
     <>
-      <Hero/>
+      <Hero />
       <RecommendationCarousel />
     </>
   );
 
   return (
-    
+
     <View className="flex-1 bg-zinc-900">
       <StatusBar style="light" />
       <AnimatedFlashList
@@ -137,38 +132,38 @@ const HomeContent: React.FC = () => {
       <Animated.View
         className="absolute top-0 left-0 right-0 flex-row justify-between items-center bg-zinc-900 z-10 pt-14"
         style={headerAnimatedStyle}
-      > 
-          
-        
+      >
+
+
         <View className="flex-row items-center px-4">
-            <Image
-              source={require('../../assets/images/logo-wide.png')} // Corrected logo path
-              style={{width: 70, height: 35 }}
-              resizeMode="contain"
-            />
-          </View> 
-         <View className="flex-row tems-center">
-          <BlurView intensity={0} className="rounded-full p-4"  onTouchEnd={handleSearchPress} >
+          <Image
+            source={require('../../assets/images/logo-wide.png')} // Corrected logo path
+            style={{ width: 70, height: 35 }}
+            resizeMode="contain"
+          />
+        </View>
+        <View className="flex-row tems-center">
+          <BlurView intensity={0} className="rounded-full p-4" onTouchEnd={handleSearchPress} >
             <Ionicons name="search" size={24} color="white" />
           </BlurView>
           <BlurView
-              intensity={0}
-              className="rounded-full p-4"
-              onTouchEnd={() => router.push('/account')}
-              style={{ alignSelf: 'flex-end' }} 
-            >
-              <Ionicons name="chatbox-ellipses-outline" size={24} color="white" />
+            intensity={0}
+            className="rounded-full p-4"
+            onTouchEnd={() => router.push('/account')}
+            style={{ alignSelf: 'flex-end' }}
+          >
+            <Ionicons name="chatbox-ellipses-outline" size={24} color="white" />
           </BlurView>
           <BlurView
-              intensity={0}
-              className="rounded-full p-4"
-              onTouchEnd={() => router.push('/account')}
-              style={{ alignSelf: 'flex-end' }} 
-            >
-              <Ionicons name="person-circle-outline" size={24} color="#fcbf49" />
+            intensity={0}
+            className="rounded-full p-4"
+            onTouchEnd={() => router.push('/account')}
+            style={{ alignSelf: 'flex-end' }}
+          >
+            <Ionicons name="person-circle-outline" size={24} color="#fcbf49" />
           </BlurView>
-          </View> 
-        
+        </View>
+
       </Animated.View>
     </View>
   );

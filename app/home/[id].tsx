@@ -9,13 +9,9 @@ import { Ionicons } from '@expo/vector-icons';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import FastImage from 'react-native-fast-image';
 import { useAuth } from '@/context/AuthProvider';
-import MapView, { Marker } from 'react-native-maps';
 import { router } from 'expo-router';
 import NearbyCarousal from '@/components/NearbyCarousal';
-import { set } from 'date-fns';
 import { usePlaceInteraction } from '@/hooks/usePlaceInteraction';
-import { useSearchPlace } from '@/hooks/useSearchPlace';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 
 const { width } = Dimensions.get('window');
@@ -28,24 +24,21 @@ const PlaceDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [overall, setOverall] = useState< 'empty' | 'above' | 'below'>('empty');
-  const [expense, setExpense] = useState< 'empty' |'cheap' | 'high' >('empty');
-  const [comfort, setComfort] = useState< 'empty' | 'comfortable' | 'exhausting' >('empty');
+  const [overall, setOverall] = useState<'empty' | 'above' | 'below'>('empty');
+  const [expense, setExpense] = useState<'empty' | 'cheap' | 'high'>('empty');
+  const [comfort, setComfort] = useState<'empty' | 'comfortable' | 'exhausting'>('empty');
   const [isExpanded, setIsExpanded] = useState(false);
   const maxDescriptionLength = 150; // Maximum length of description to show before expanding
   const { interactions, getInteractions, updateOverall, updateExpense, updateComfort, fetchCounts, refetch } = usePlaceInteraction(id);
-  const [intialRefresh, setInitialRefresh] = useState(0);
-  const { getNearbyPlaces } = useSearchPlace();
-  // const [nearbyPlaces, setNearbyPlaces] = useState<Place[]>([]);
-  const [ratings, setRatings] = useState<'average' | 'good' | 'amazing' >('good');
-  const [price, setPrice] = useState<'average' | 'cheap' | 'expensive' >('average');
-  const [comfortness, setComfortness] = useState<'average' | 'comfortable' | 'exhausting' >('average');
+  const [ratings, setRatings] = useState<'average' | 'good' | 'amazing'>('good');
+  const [price, setPrice] = useState<'average' | 'cheap' | 'expensive'>('average');
+  const [comfortness, setComfortness] = useState<'average' | 'comfortable' | 'exhausting'>('average');
 
 
-  
-  
+
+
   const SEARCH_RADIUS = 2;
-  
+
   const checkBookmarkStatus = async () => {
     // const nearbyPlaces = await getNearbyPlaces(id,SEARCH_RADIUS);
     // setNearbyPlaces(nearbyPlaces.near_places);
@@ -59,7 +52,7 @@ const PlaceDetails: React.FC = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-        // console.log(data);
+      // console.log(data);
 
       if (error) throw error;
       setIsBookmarked(!!data);
@@ -73,36 +66,36 @@ const PlaceDetails: React.FC = () => {
     try {
       const InteractionsCouts = await fetchCounts();
       // console.log(InteractionsCouts);
-      if(InteractionsCouts.countHigh > InteractionsCouts.countCheap) {
+      if (InteractionsCouts.countHigh > InteractionsCouts.countCheap) {
         setPrice('expensive');
       }
-      else if(InteractionsCouts.countHigh < InteractionsCouts.countCheap) {
+      else if (InteractionsCouts.countHigh < InteractionsCouts.countCheap) {
         setPrice('cheap');
       }
       else {
         setPrice('average');
       }
 
-      if(InteractionsCouts.countComfortable > InteractionsCouts.countExhausting) {
+      if (InteractionsCouts.countComfortable > InteractionsCouts.countExhausting) {
         setComfortness('comfortable');
       }
-      else if(InteractionsCouts.countComfortable < InteractionsCouts.countExhausting) {
+      else if (InteractionsCouts.countComfortable < InteractionsCouts.countExhausting) {
         setComfortness('exhausting');
       }
       else {
         setComfortness('average');
       }
 
-      if(InteractionsCouts.countAbove > InteractionsCouts.countBelow) {
+      if (InteractionsCouts.countAbove > InteractionsCouts.countBelow) {
         setRatings('amazing');
       }
-      else if(InteractionsCouts.countAbove < InteractionsCouts.countBelow) {
+      else if (InteractionsCouts.countAbove < InteractionsCouts.countBelow) {
         setRatings('average');
       }
       else {
         setRatings('good');
       }
-      
+
     } catch (error) {
       console.error('Error fetching interactions:', error);
     }
@@ -147,7 +140,7 @@ const PlaceDetails: React.FC = () => {
   fetchUserInteractions();
   // Check if place is bookmarked on component mount
   useEffect(() => {
-    
+
 
     checkBookmarkStatus();
     fetchInteractions();
@@ -220,7 +213,7 @@ const PlaceDetails: React.FC = () => {
     updateComfort('exhausting');
   };
 
-  const handleClickOnLocation = async () => { 
+  const handleClickOnLocation = async () => {
     Linking.openURL(place?.external_link!);
   }
 
@@ -256,7 +249,7 @@ const PlaceDetails: React.FC = () => {
   }
 
 
-  const toggleExpanded = async() => {
+  const toggleExpanded = async () => {
     setIsExpanded(!isExpanded);
   };
 
@@ -331,7 +324,7 @@ const PlaceDetails: React.FC = () => {
   );
 
   const handlePlaceClick = (place_id: string) => {
-    router.push(`../../../mytrips}`); // Navigate to the Place screen with the placeId
+    router.push(`../home/${place_id}`); // Navigate to the Place screen with the placeId
   };
 
   return (
@@ -353,48 +346,48 @@ const PlaceDetails: React.FC = () => {
             </TouchableOpacity>
           </View>
         </BlurView>
-        <TouchableOpacity onPress={handleBookmark} className= {`ml-2 absolute bottom-0 right-10 flex-row items-center p-4 rounded-xl drop-shadow-xl  ${!isBookmarked ? 'bg-zinc-800' : 'bg-zinc-800'}`}>
+        <TouchableOpacity onPress={handleBookmark} className={`ml-2 absolute bottom-0 right-10 flex-row items-center p-4 rounded-xl drop-shadow-xl  ${!isBookmarked ? 'bg-zinc-800' : 'bg-zinc-800'}`}>
           <Text className={`text-xl text-gray-300 mr-2 flex-col ${!isBookmarked ? 'text-white' : 'text-[#fcbf49]'}`}>{!isBookmarked ? 'Add to Bookmark' : 'Added to Bookmarkes'}</Text>
-            {
-              !isBookmarked ?
-                <Ionicons className="" name="bookmark-outline" size={25} color="#fff" />
-                : <Ionicons name="bookmark" size={25} color="#fcbf49" />
-            }
-          </TouchableOpacity>
+          {
+            !isBookmarked ?
+              <Ionicons className="" name="bookmark-outline" size={25} color="#fff" />
+              : <Ionicons name="bookmark" size={25} color="#fcbf49" />
+          }
+        </TouchableOpacity>
       </View>
-      
+
       <Animated.View entering={FadeInUp.delay(300).duration(500)} className="p-6">
         <Animated.Text entering={FadeInDown.delay(400).duration(500)} className="text-4xl font-bold text-white width-full mb-2 flex-row justify-between items-center"><Text className="mr-4">{place?.name}</Text>
         </Animated.Text>
 
         <Animated.View entering={FadeInDown.delay(500).duration(500)} className="flex-row items-center mb-4 ">
-          <TouchableOpacity className="bg-zinc-800 py-1 px-2 mr-2 rounded-full flex-row items-center" onPress={handleClickOnLocation}> 
+          <TouchableOpacity className="bg-zinc-800 py-1 px-2 mr-2 rounded-full flex-row items-center" onPress={handleClickOnLocation}>
             <Ionicons name="location-outline" size={14} color="#fcbf49" />
-            <Text className="text-gray-300 ml-1 " style={{fontSize: 12}}>{place?.city || 'Unknown Location'}</Text>
+            <Text className="text-gray-300 ml-1 " style={{ fontSize: 12 }}>{place?.city || 'Unknown Location'}</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity className="bg-zinc-800 py-1 px-2 mr-5 rounded-full flex-row items-center">
-          <Ionicons name="pricetag-outline" size={14} color="#fcbf49" />
-          <Text className="text-gray-300 ml-1" style={{fontSize: 12}}>{place?.category}</Text>
+            <Ionicons name="pricetag-outline" size={14} color="#fcbf49" />
+            <Text className="text-gray-300 ml-1" style={{ fontSize: 12 }}>{place?.category}</Text>
           </TouchableOpacity>
         </Animated.View>
         <Animated.View entering={FadeInDown.delay(500).duration(500)} className="flex-row items-center mb-4 ">
-          <TouchableOpacity className=" py-1 px-2 mr-2 rounded-full flex-row items-center gap-2"> 
+          <TouchableOpacity className=" py-1 px-2 mr-2 rounded-full flex-row items-center gap-2">
             <Ionicons name={ratings === "good" ? "thumbs-up" : ratings === "average" ? "thumbs-down-outline" : "star"} size={14} color="#e3e3e3" />
-            <Text className="text-[#e3e3e3]"  style={{fontSize: 12}}>{ratings === "good" ? "Good place" : ratings === "average" ? "Average place" : "Amazing place"}</Text>
+            <Text className="text-[#e3e3e3]" style={{ fontSize: 12 }}>{ratings === "good" ? "Good place" : ratings === "average" ? "Average place" : "Amazing place"}</Text>
           </TouchableOpacity>
-          <TouchableOpacity className=" py-1 px-2 mr-2 rounded-full flex-row items-center gap-2"> 
+          <TouchableOpacity className=" py-1 px-2 mr-2 rounded-full flex-row items-center gap-2">
             <Ionicons name="card" size={14} color="#e3e3e3" />
-            <Text className="text-[#e3e3e3]"  style={{fontSize: 12}}>{price === 'average' ? "Average prices" : price === 'cheap' ? "Cheap prices" : "Expensive prices"}</Text>
+            <Text className="text-[#e3e3e3]" style={{ fontSize: 12 }}>{price === 'average' ? "Average prices" : price === 'cheap' ? "Cheap prices" : "Expensive prices"}</Text>
           </TouchableOpacity>
-          <TouchableOpacity className=" py-1 px-2 mr-2 rounded-full flex-row items-center gap-2"> 
+          <TouchableOpacity className=" py-1 px-2 mr-2 rounded-full flex-row items-center gap-2">
             <Ionicons name="walk" size={14} color="#e3e3e3" />
-            <Text className="text-[#e3e3e3]"  style={{fontSize: 12}}>{comfortness === 'average' ? "Not much effort" : comfortness === 'comfortable' ? "Easy trip" : "Takes some effort"}</Text>
+            <Text className="text-[#e3e3e3]" style={{ fontSize: 12 }}>{comfortness === 'average' ? "Not much effort" : comfortness === 'comfortable' ? "Easy trip" : "Takes some effort"}</Text>
           </TouchableOpacity>
         </Animated.View>
-        
 
-        { !(description === 'No description yet') && <TouchableOpacity onPress={toggleExpanded} >
+
+        {!(description === 'No description yet') && <TouchableOpacity onPress={toggleExpanded} >
           <Animated.Text
             entering={FadeInDown.delay(600).duration(500)}
             className="text-gray-300 text-base leading-6 mb-2 rounded-xl p-4 bg-zinc-800"
@@ -413,9 +406,8 @@ const PlaceDetails: React.FC = () => {
             <TouchableOpacity
               style={{ width: 145 }}
               onPress={handleFeedbackUp}
-              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                overall === 'above' ? 'bg-blue-400' : 'bg-white'
-              }`}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${overall === 'above' ? 'bg-blue-400' : 'bg-white'
+                }`}
             >
               <Text className={`mr-2 text-sm font-bold ${overall === 'above' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Amazing</Text>
               <Ionicons
@@ -428,11 +420,10 @@ const PlaceDetails: React.FC = () => {
             <TouchableOpacity
               style={{ width: 145 }}
               onPress={handleFeedbackDown}
-              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                overall === 'below' ? 'bg-red-400' : 'bg-white'
-              }`}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${overall === 'below' ? 'bg-red-400' : 'bg-white'
+                }`}
             >
-              
+
               <Ionicons
                 name={overall === 'below' ? 'thumbs-down' : 'thumbs-down-outline'}
                 size={18}
@@ -446,11 +437,10 @@ const PlaceDetails: React.FC = () => {
           {/* Feedback for Place is Expensive */}
           <View className="flex-row justify-center items-center my-2">
             <TouchableOpacity
-            style={{ width: 145 }}
+              style={{ width: 145 }}
               onPress={handleFeedbackAffordable}
-              className={`p-2 rounded-lg mx-4 flex-row items-center ${
-                expense === 'cheap' ? 'bg-orange-400' : 'bg-white'
-              }`}
+              className={`p-2 rounded-lg mx-4 flex-row items-center ${expense === 'cheap' ? 'bg-orange-400' : 'bg-white'
+                }`}
             >
               <Text className={`mr-2 text-sm font-bold ${expense === 'cheap' ? 'text-zinc-900' : 'text-zinc-800'}`} >Cheaper than Expect</Text>
               <Ionicons
@@ -463,9 +453,8 @@ const PlaceDetails: React.FC = () => {
             <TouchableOpacity
               style={{ width: 145 }}
               onPress={handleFeedbackExpensive}
-              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                expense === 'high' ? 'bg-yellow-400' : 'bg-white'
-              }`}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${expense === 'high' ? 'bg-yellow-400' : 'bg-white'
+                }`}
             >
               <Ionicons
                 name={expense === 'high' ? 'cash' : 'cash-outline'}
@@ -478,15 +467,14 @@ const PlaceDetails: React.FC = () => {
 
           {/* Feedback for Place is Exhausting */}
           <View className="flex-row justify-center items-center my-2">
-              
+
             <TouchableOpacity
               style={{ width: 145 }}
               onPress={handleFeedbackRelaxing}
-              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                comfort === 'comfortable' ? 'bg-green-400' : 'bg-white'
-              }`}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${comfort === 'comfortable' ? 'bg-green-400' : 'bg-white'
+                }`}
             >
-              
+
               <Text className={`mr-2 text-sm font-bold ${comfort === 'comfortable' ? 'text-zinc-900' : 'text-zinc-800'}`}>Place is Relaxing</Text>
               <Ionicons
                 name={comfort === 'comfortable' ? 'leaf' : 'leaf-outline'}
@@ -498,9 +486,8 @@ const PlaceDetails: React.FC = () => {
             <TouchableOpacity
               style={{ width: 145 }}
               onPress={handleFeedbackExhausting}
-              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${
-                comfort === 'exhausting' ? 'bg-gray-400' : 'bg-white'
-              }`}
+              className={`p-2 rounded-lg mx-4 flex-row items-center justify-center ${comfort === 'exhausting' ? 'bg-gray-400' : 'bg-white'
+                }`}
             >
               <Ionicons
                 name={comfort === 'exhausting' ? 'battery-dead' : 'battery-dead-outline'}
@@ -518,7 +505,7 @@ const PlaceDetails: React.FC = () => {
           className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 px-2 rounded-xl border-2 border-zinc-900 shadow-lg"
         >
           <Text className="text-white text-xl font-bold mb-4 py-2 px-2" style={{ color: '#AAA' }}>Explore More About The Place</Text>
-          
+
           <View className="flex-row justify-center items-center my-2">
 
             <TouchableOpacity
@@ -532,7 +519,7 @@ const PlaceDetails: React.FC = () => {
               />
               <Text className="ml-2 text-sm font-bold text-white">Explore on TikTok</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={{ width: 145 }}
               onPress={handleClickOnYoutube}
@@ -545,11 +532,11 @@ const PlaceDetails: React.FC = () => {
               <Text className="ml-2 text-sm font-bold text-white">Explore on YouTube</Text>
             </TouchableOpacity>
 
-            
+
           </View>
           <View className="flex-row justify-center items-center my-2">
 
-          <TouchableOpacity
+            <TouchableOpacity
               style={{ width: 145 }}
               onPress={handleClickOnInstagram}
               className="p-2 rounded-lg mx-4 flex-row items-center justify-center bg-pink-600">
@@ -560,9 +547,9 @@ const PlaceDetails: React.FC = () => {
               />
               <Text className="ml-2 text-sm font-bold text-white">Explore on Instagram</Text>
             </TouchableOpacity>
-            
-          <TouchableOpacity
-             style={{ width: 145 }}
+
+            <TouchableOpacity
+              style={{ width: 145 }}
               onPress={handleClickOnPinterest}
               className="p-2 rounded-lg mx-4 flex-row items-center justify-center bg-red-400">
               <Ionicons
@@ -574,20 +561,20 @@ const PlaceDetails: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          
+
         </Animated.View>
         <Animated.View
-            entering={FadeInDown.delay(800).duration(500)}
-            className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 rounded-xl border-2 border-zinc-900 shadow-lg"
-          >
-            <Text className="text-white text-xl font-bold mb-4 py-2 px-2 mx-4" style={{ color: '#AAA' }}>Nearby Places</Text>
+          entering={FadeInDown.delay(800).duration(500)}
+          className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 rounded-xl border-2 border-zinc-900 shadow-lg"
+        >
+          <Text className="text-white text-xl font-bold mb-4 py-2 px-2 mx-4" style={{ color: '#AAA' }}>Nearby Places</Text>
 
-            <NearbyCarousal mainPlaceId={id} />
-            
-          </Animated.View>
+          <NearbyCarousal mainPlaceId={id} />
+
         </Animated.View>
-        
-      </ScrollView>
+      </Animated.View>
+
+    </ScrollView>
 
   );
 };
