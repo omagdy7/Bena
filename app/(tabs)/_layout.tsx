@@ -4,8 +4,7 @@ import { TabIcon } from '@/components/TabIcon';
 import { StatusBar } from 'expo-status-bar';
 import { BlurView } from 'expo-blur';
 import { View } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import { Home, Bookmark, PlusIcon, Bike, CircleUser, Heart, MapIcon, CompassIcon } from 'lucide-react-native';
+import { Bookmark, PlusIcon, Bike, MapIcon, CompassIcon } from 'lucide-react-native';
 
 const tabScreens = [
   { name: 'home', title: 'Explore', icon: CompassIcon },
@@ -17,14 +16,7 @@ const tabScreens = [
 
 const TabsLayout = () => {
   const [hideBlurView, setHideBlurView] = useState(false);
-  const hideScreens = [/*'create', 'trip'*/]
-
-  useFocusEffect(
-    useCallback(() => {
-      // Reset the state when the tab changes
-      setHideBlurView(false);
-    }, [])
-  );
+  const hideScreens: any = []
 
   return (
     <View className='flex-1'>
