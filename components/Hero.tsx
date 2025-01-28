@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, TouchableOpacity  } from 'react-native';
+import { Dimensions, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -10,7 +10,7 @@ const { width, height } = Dimensions.get('window');
 const HEADER_HEIGHT = height * 0.4;
 
 export const Hero: React.FC = () => (
-  <Animated.View   style={{ height: HEADER_HEIGHT }}>
+  <Animated.View style={{ height: HEADER_HEIGHT }}>
     <FastImage
       source={{ uri: 'https://images.unsplash.com/photo-1572252009286-268acec5ca0a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }}
       style={{ width, height: HEADER_HEIGHT }}
@@ -37,12 +37,6 @@ export const Hero: React.FC = () => (
           entering={FadeInDown.delay(500).springify()}
           className="flex-row mt-4"
         >
-          <TouchableOpacity className="bg-[#fcbf49] py-3 px-6 rounded-full mr-4">
-            <Text className="text-zinc-900 font-bold">Explore Now</Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="bg-zinc-800 py-3 px-6 rounded-full">
-            <Text className="text-white font-bold">Learn More</Text>
-          </TouchableOpacity>
         </Animated.View>
       </BlurView>
     </LinearGradient>
