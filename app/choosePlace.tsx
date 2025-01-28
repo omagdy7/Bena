@@ -36,7 +36,7 @@ const TabView: React.FC<{
         const isActive = tab === activeTab;
         return (
           <AnimatedTouchableOpacity
-            key={tab}
+            key={index}
             onPress={() => onTabChange(tab)}
             className={`flex-1 py-2 ${index === 0 ? 'rounded-l-full' : ''} ${index === tabs.length - 1 ? 'rounded-r-full' : ''
               }`}
