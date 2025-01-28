@@ -152,14 +152,6 @@ const HomeContent: React.FC = () => {
             onTouchEnd={() => router.push('/account')}
             style={{ alignSelf: 'flex-end' }}
           >
-            <Ionicons name="chatbox-ellipses-outline" size={24} color="white" />
-          </BlurView>
-          <BlurView
-            intensity={0}
-            className="rounded-full p-4"
-            onTouchEnd={() => router.push('/account')}
-            style={{ alignSelf: 'flex-end' }}
-          >
             <Ionicons name="person-circle-outline" size={24} color="#fcbf49" />
           </BlurView>
         </View>
