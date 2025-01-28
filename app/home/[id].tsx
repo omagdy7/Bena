@@ -12,7 +12,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { router } from 'expo-router';
 import NearbyCarousal from '@/components/NearbyCarousal';
 import { usePlaceInteraction } from '@/hooks/usePlaceInteraction';
-
+import ModalSelector from 'react-native-modal-selector';
 
 const { width } = Dimensions.get('window');
 
@@ -28,16 +28,42 @@ const PlaceDetails: React.FC = () => {
   const [expense, setExpense] = useState<'empty' | 'cheap' | 'high'>('empty');
   const [comfort, setComfort] = useState<'empty' | 'comfortable' | 'exhausting'>('empty');
   const [isExpanded, setIsExpanded] = useState(false);
-  const maxDescriptionLength = 150; // Maximum length of description to show before expanding
-  const { interactions, getInteractions, updateOverall, updateExpense, updateComfort, fetchCounts, refetch } = usePlaceInteraction(id);
+  const maxDescriptionLength = 150;
+  const [translatedDescription, setTranslatedDescription] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [language, setLanguage] = useState('ar');
+  const { interactions, updateOverall, updateExpense, updateComfort, fetchCounts, refetch } = usePlaceInteraction(id);
   const [ratings, setRatings] = useState<'average' | 'good' | 'amazing'>('good');
   const [price, setPrice] = useState<'average' | 'cheap' | 'expensive'>('average');
   const [comfortness, setComfortness] = useState<'average' | 'comfortable' | 'exhausting'>('average');
-
-
-
-
-  const SEARCH_RADIUS = 2;
+  const languageData = [
+    { key: 0, label: 'Spanish', value: 'es' },
+    { key: 1, label: 'French', value: 'fr' },
+    { key: 2, label: 'German', value: 'de' },
+    { key: 3, label: 'Arabic', value: 'ar' },
+    { key: 4, label: 'Chinese', value: 'zh' },
+    { key: 5, label: 'Russian', value: 'ru' },
+    { key: 6, label: 'Italian', value: 'it' },
+    { key: 7, label: 'Japanese', value: 'jp' },
+  ];
+  const translateDescription = async () => {
+    if (!place?.description) return;
+    setIsTranslating(true);
+    setTranslatedDescription(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('translate', {
+        body: {
+          text: place.description,
+          targetLanguage: language
+        }
+      });
+      setTranslatedDescription(data.translation);
+    } catch (error) {
+      console.error('Error translating description:', error);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   const checkBookmarkStatus = async () => {
     // const nearbyPlaces = await getNearbyPlaces(id,SEARCH_RADIUS);
@@ -60,6 +86,7 @@ const PlaceDetails: React.FC = () => {
     } catch (err) {
       console.error('Error checking bookmark status:', err);
     }
+
   };
 
   const fetchInteractions = async () => {
@@ -99,30 +126,8 @@ const PlaceDetails: React.FC = () => {
     } catch (error) {
       console.error('Error fetching interactions:', error);
     }
+
   };
-
-
-  // try {
-  //   const currentinteractions = interactions[0];
-  //   if (intialRefresh < 4) {
-
-  //     if(!currentinteractions) {
-  //       setOverall('empty');
-  //       setExpense('empty');
-  //       setComfort('empty');  
-  //     }
-  //     else{
-  //       setOverall(currentinteractions.overall);
-  //       setExpense(currentinteractions.expense);
-  //       setComfort(currentinteractions.comfort);
-  //       // checkBookmarkStatus();
-  //     }
-  //     setInitialRefresh(intialRefresh+1);
-  // }
-  // } catch (error) {
-  //   console.error('Error fetching interactions:', error);
-  // }
-
 
   const fetchUserInteractions = async () => {
     try {
@@ -135,16 +140,17 @@ const PlaceDetails: React.FC = () => {
       setComfort(interactions[0]?.comfort || 'empty');
 
     }
+
   };
 
   fetchUserInteractions();
   // Check if place is bookmarked on component mount
   useEffect(() => {
 
-
     checkBookmarkStatus();
     fetchInteractions();
     fetchUserInteractions();
+
   }, [user, id]);
 
   const handleBookmark = async () => {
@@ -181,6 +187,7 @@ const PlaceDetails: React.FC = () => {
       console.error('Error toggling bookmark:', err);
       // You might want to show an error message to the user
     }
+
   }
 
   const handleFeedbackUp = async () => {
@@ -217,11 +224,6 @@ const PlaceDetails: React.FC = () => {
     Linking.openURL(place?.external_link!);
   }
 
-  const handleClickOnGoogleMaps = async () => {
-    Linking.openURL(place?.external_link!);
-  }
-
-
   const handleClickOnTiktok = async () => {
     Linking.openURL(`https://www.google.com/search?q=site%3Atiktok.com+${place?.name} ${place?.city}  ${!(place?.arabic_name === "Not available yet") ? place?.arabic_name : ''}`);
   };
@@ -229,10 +231,6 @@ const PlaceDetails: React.FC = () => {
   const handleClickOnInstagram = async () => {
     Linking.openURL(`https://www.google.com/search?q=site%3Ainstagram.com+${place?.name} ${place?.city}  ${!(place?.arabic_name === "Not available yet") ? place?.arabic_name : ''}`);
 
-  }
-
-  const handleClickOnTwitter = async () => {
-    Linking.openURL(`https://www.google.com/search?q=site%3Atwitter.com+${place?.name}`);
   }
 
   const handleClickOnPinterest = async () => {
@@ -244,11 +242,6 @@ const PlaceDetails: React.FC = () => {
 
   }
 
-  const handleClickOnTripadvisor = async () => {
-    Linking.openURL(`https://www.google.com/search?q=site%3Atripadvisor.com+${place?.name}`);
-  }
-
-
   const toggleExpanded = async () => {
     setIsExpanded(!isExpanded);
   };
@@ -257,7 +250,6 @@ const PlaceDetails: React.FC = () => {
     place?.description.length > maxDescriptionLength && !isExpanded
       ? `${place?.description.slice(0, maxDescriptionLength)}...`
       : place?.description;
-
 
   useEffect(() => {
     const fetchPlace = async () => {
@@ -280,6 +272,7 @@ const PlaceDetails: React.FC = () => {
     if (id) {
       fetchPlace();
     }
+
   }, [id]);
 
   if (loading) {
@@ -305,11 +298,10 @@ const PlaceDetails: React.FC = () => {
     );
   }
 
-
   const renderNearbyPlace = ({ item }: { item: any }) => (
     <TouchableOpacity
       className="bg-zinc-800 p-4 rounded-lg mr-4"
-      onPress={() => handlePlaceClick(item.place_id)} // Update `place_id` to match your data model
+      onPress={() => handlePlaceClick(item.place_id)} // Update place_id to match your data model
     >
       <FastImage
         source={{ uri: item.image }}
@@ -326,6 +318,12 @@ const PlaceDetails: React.FC = () => {
   const handlePlaceClick = (place_id: string) => {
     router.push(`../home/${place_id}`); // Navigate to the Place screen with the placeId
   };
+
+  const renderDropdownRow = (option: { label: string, value: string }, index: number, isSelected: boolean) => (
+    <View className={`px-4 py-2 ${isSelected ? 'bg-blue-500' : 'bg-zinc-800'}`}>
+      <Text className="text-white">{option.label}</Text>
+    </View>
+  );
 
   return (
     <ScrollView className="flex-1 bg-zinc-900">
@@ -346,7 +344,7 @@ const PlaceDetails: React.FC = () => {
             </TouchableOpacity>
           </View>
         </BlurView>
-        <TouchableOpacity onPress={handleBookmark} className={`ml-2 absolute bottom-0 right-10 flex-row items-center p-4 rounded-xl drop-shadow-xl  ${!isBookmarked ? 'bg-zinc-800' : 'bg-zinc-800'}`}>
+        <TouchableOpacity onPress={handleBookmark} className={`ml-2 absolute bottom-0 right-10 flex-row items-center p-4 rounded-xl drop-shadow-xl ${!isBookmarked ? 'bg-zinc-800' : 'bg-zinc-800'}`}>
           <Text className={`text-xl text-gray-300 mr-2 flex-col ${!isBookmarked ? 'text-white' : 'text-[#fcbf49]'}`}>{!isBookmarked ? 'Add to Bookmark' : 'Added to Bookmarkes'}</Text>
           {
             !isBookmarked ?
@@ -386,20 +384,43 @@ const PlaceDetails: React.FC = () => {
           </TouchableOpacity>
         </Animated.View>
 
-
         {!(description === 'No description yet') && <TouchableOpacity onPress={toggleExpanded} >
           <Animated.Text
             entering={FadeInDown.delay(600).duration(500)}
             className="text-gray-300 text-base leading-6 mb-2 rounded-xl p-4 bg-zinc-800"
           >
-            <Text>{description} </Text>
+            <Text>{translatedDescription || description}</Text>
             {isExpanded || description.length < maxDescriptionLength ? null : (<Text className="text-blue-400">Show More</Text>)}
           </Animated.Text>
         </TouchableOpacity>}
+        <View className="flex-row items-center mt-4 mb-4 gap-4">
+          <ModalSelector
+            data={languageData}
+            initValue="Select Language"
+            onChange={(option) => { setLanguage(option.value) }}
+            cancelText="Cancel" // Customize cancel button text (optional)
+            style={{ flex: 1 }} // Adjust styling as needed
+            selectStyle={{ backgroundColor: '#3f3f46', borderWidth: 0, padding: 10, borderRadius: 8 }} // Style for the select/input button
+            selectTextStyle={{ color: 'white', fontSize: 16 }} // Style for the text inside the select/input button
+            optionStyle={{ backgroundColor: '#3f3f46', borderBottomWidth: 1, borderBottomColor: '#666' }} // Style for each option
+            optionTextStyle={{ color: 'white', fontSize: 16 }} // Style for the text of each option
+            cancelStyle={{ backgroundColor: '#fcbf49', padding: 10, borderRadius: 8 }} // Style for the cancel button
+            cancelTextStyle={{ color: 'white', fontWeight: 'bold' }} // Style for the cancel button text
+          />
+
+          <TouchableOpacity
+            onPress={translateDescription}
+            className=" p-3 bg-amber-500 rounded-lg"
+          >
+            <Text className="text-white">
+              {isTranslating ? 'Translating...' : 'Translate'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <Animated.View
           entering={FadeInDown.delay(800).duration(500)}
-          className="py-2 mt-0 mb-4 bg-zinc-800 border-2 pb-8 pt-4 px-2 rounded-xl border-2 border-zinc-700"
+          className="py-2 mt-0 mb-4 bg-zinc-800 pb-8 pt-4 px-2 rounded-xl border-2 border-zinc-700"
         >
           <Text className="text-white text-xl font-bold mb-4 py-2 px-2" style={{ color: '#AAA' }}>Share Your Experience With The Place</Text>
           <View className="flex-row justify-center items-center my-2">
@@ -432,7 +453,6 @@ const PlaceDetails: React.FC = () => {
               <Text className={`ml-2 text-sm font-bold ${overall === 'below' ? 'text-zinc-900' : 'text-zinc-800'}`}>Below Expectations</Text>
             </TouchableOpacity>
           </View>
-
 
           {/* Feedback for Place is Expensive */}
           <View className="flex-row justify-center items-center my-2">
@@ -532,7 +552,6 @@ const PlaceDetails: React.FC = () => {
               <Text className="ml-2 text-sm font-bold text-white">Explore on YouTube</Text>
             </TouchableOpacity>
 
-
           </View>
           <View className="flex-row justify-center items-center my-2">
 
@@ -561,7 +580,6 @@ const PlaceDetails: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-
         </Animated.View>
         <Animated.View
           entering={FadeInDown.delay(800).duration(500)}
@@ -575,10 +593,7 @@ const PlaceDetails: React.FC = () => {
       </Animated.View>
 
     </ScrollView>
-
   );
 };
 
 export default PlaceDetails;
-
-
