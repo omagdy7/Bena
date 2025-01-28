@@ -22,12 +22,13 @@ interface FormData {
 }
 
 const SignIn = () => {
-  const { signIn, signUp } = useAuth();
+  const { signIn } = useAuth();
   const [form, setForm] = useState<FormData>({
     email: '',
     password: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [emailError, setEmailError] = useState<'valid' | 'empty' | 'wrong_format'>('valid');
   const [passwordError, setPasswordError] = useState<'valid' | 'empty' | 'wrong_format'>('valid');
@@ -46,6 +47,7 @@ const SignIn = () => {
       .filter((rule) => !rule.regex.test(password))
       .map((rule) => rule.label);
     setPasswordErrors(errors);
+    setPasswordStrength(((passwordRules.length - errors.length) / passwordRules.length) * 100);
   };
 
   const handlePasswordChange = (password: string) => {
@@ -153,33 +155,14 @@ const SignIn = () => {
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
 
+          <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignIn} isLoading={isSubmitting} />
+          <Link href="/sign-up" style={styles.footer}>
+            <Text style={styles.footerText}>
+              Don't have an account?{' '}
+              <Text style={styles.signUpText}>Sign Up</Text>
+            </Text>
+          </Link>
         </View>
-        <View style={styles.progressContainer}>
-          <View style={[styles.progressBar, { backgroundColor: `hsl(${passwordStrength}, 100%, 50%)` }, { width: `${passwordStrength}%` }]} />
-        </View>
-        {passwordRules.map((rule) => (
-          passwordErrors.includes(rule.label) && <Text
-            key={rule.label}
-            style={[
-              styles.rule,
-              !passwordErrors.includes(rule.label) ? styles.validRule : styles.invalidRule,
-            ]}
-          >
-            {rule.label}
-          </Text>
-        ))}
-
-        <TouchableOpacity>
-          <Text style={styles.forgotPassword}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignIn} isLoading={isSubmitting} />
-        <Link href="/sign-up" style={styles.footer}>
-          <Text style={styles.footerText}>
-            Don't have an account?{' '}
-            <Text style={styles.signUpText}>Sign Up</Text>
-          </Text>
-        </Link>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
