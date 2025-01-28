@@ -187,7 +187,6 @@ export default function RootLayout() {
         <StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
         <AuthProvider>
           <Stack>
-            <Stack.Screen name="new-account" options={{ headerShown: false }} />
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="search" options={{ headerShown: true, title: 'Smart Search' }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
@@ -195,7 +194,7 @@ export default function RootLayout() {
             <Stack.Screen name="settings" options={{ headerShown: false }} />
             <Stack.Screen name="history" options={{ headerShown: false }} />
             <Stack.Screen name="home/[id]" options={{ headerShown: false }} />
-            <Stack.Screen name="mytrips/[id]"  options={{ headerShown: false }} />
+            <Stack.Screen name="mytrips/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="share/trip/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="editPlace" options={{ headerShown: false }} />
             <Stack.Screen name="choosePlace"
