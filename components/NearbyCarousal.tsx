@@ -1,6 +1,5 @@
 import { useRouter } from 'expo-router';
 import CategoryCarousel from './CategoryCarousel';
-import { useRecommendations } from '@/hooks/useRecommendations';
 import { Animated, Text, View } from 'react-native';
 import { FadeInRight } from 'react-native-reanimated';
 import { useSearchPlace } from '@/hooks/useSearchPlace';

@@ -10,11 +10,11 @@ import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import { format } from 'date-fns';
 import useAllTrips from '@/hooks/useAllTrips';
-import HomeSkeleton from '@/components/HomeSkeleton';
+import LoadingUI from '@/components/LoadingUI';
 
 
 const TripCard = ({ trip, index, setSyncing, setSyncedDate }) => {
-  const { refetch, markAsInProgress, markAsPlanned, markAsCompleted, deleteTrip } = useAllTrips(); // useAllTrips hook
+  const { refetch, markAsInProgress, markAsPlanned, deleteTrip } = useAllTrips(); // useAllTrips hook
   const [status, setStatus] = useState<'in_progress' | 'planned' | 'completed'>(trip.status);
   const [deleted, setDeleted] = useState<boolean>(false);
   const [isUpdated, setUpdated] = useState<boolean>(false);
@@ -46,13 +46,6 @@ const TripCard = ({ trip, index, setSyncing, setSyncedDate }) => {
     await afterAction();
 
 
-  };
-
-  const handleSwitchToCompleted = async () => {
-    await beforeAction();
-    setStatus('completed');
-    await markAsCompleted(trip.trip_id);
-    await afterAction();
   };
 
   const handleSwitchToPlanned = async () => {
@@ -136,7 +129,7 @@ const TripCard = ({ trip, index, setSyncing, setSyncedDate }) => {
 
 
                 <View className={` flex-row items-center rounded-full px-2 py-1 ${isUpdated ? status === 'planned' ? 'bg-gray-300' : status === 'in_progress' ? 'bg-[#fcbf49]' : 'bg-gray-300'
-                    : trip.status === 'planned' ? 'bg-gray-300' : trip.status === 'in_progress' ? 'bg-[#fcbf49]' : 'bg-gray-300'}`}>
+                  : trip.status === 'planned' ? 'bg-gray-300' : trip.status === 'in_progress' ? 'bg-[#fcbf49]' : 'bg-gray-300'}`}>
                   <Ionicons name={
                     isUpdated ? status === 'planned' ? 'time-outline' : status === 'in_progress' ? 'airplane-outline' : 'checkmark-done'
                       : trip.status === 'planned' ? 'time-outline' : trip.status === 'in_progress' ? 'airplane-outline' : 'checkmark-done'
@@ -195,7 +188,7 @@ const TripCard = ({ trip, index, setSyncing, setSyncedDate }) => {
             style={{ width: 115 }}
             onPress={trip.status === 'planned' ? handleSwitchToInProgress : trip.status === 'in_progress' ? handleSwitchToPlanned : handleSwitchToPlanned}
             className={`p-2 mt-2 rounded-xl  flex-row items-center justify-center ${isUpdated ? status === 'planned' ? 'bg-green-300' : status === 'in_progress' ? 'bg-gray-300' : 'bg-blue-300'
-                : trip.status === 'planned' ? 'bg-green-300' : trip.status === 'in_progress' ? 'bg-gray-300' : 'bg-blue-300'} `}>
+              : trip.status === 'planned' ? 'bg-green-300' : trip.status === 'in_progress' ? 'bg-gray-300' : 'bg-blue-300'} `}>
             <Ionicons
               name={
                 isUpdated ? status === 'planned' ? 'play' : status === 'in_progress' ? 'pause' : 'refresh'
@@ -260,12 +253,7 @@ const AllTrips = () => {
   }, [refetch]);
 
   if (loading) {
-    return (
-      <SafeAreaView className="flex-1 bg-zinc-900 justify-center items-center">
-        <StatusBar style="light" />
-        <HomeSkeleton />
-      </SafeAreaView>
-    );
+    return <LoadingUI />
   }
 
   if (!trips || trips.length === 0) {

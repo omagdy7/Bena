@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '@/constants';
 import CustomButton from '@/components/CustomButton';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useAuth } from '@/context/AuthProvider';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -28,7 +28,6 @@ const SignIn = () => {
     password: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [emailError, setEmailError] = useState<'valid' | 'empty' | 'wrong_format'>('valid');
   const [passwordError, setPasswordError] = useState<'valid' | 'empty' | 'wrong_format'>('valid');
@@ -47,7 +46,6 @@ const SignIn = () => {
       .filter((rule) => !rule.regex.test(password))
       .map((rule) => rule.label);
     setPasswordErrors(errors);
-    setPasswordStrength(((passwordRules.length - errors.length) / passwordRules.length) * 100);
   };
 
   const handlePasswordChange = (password: string) => {
@@ -104,28 +102,6 @@ const SignIn = () => {
     }
   };
 
-  const handleSignUp = async () => {
-    if (!validateForm()) return;
-    setIsSubmitting(true);
-    console.log('signing up');
-    try {
-      const { user } = await signUp({
-        email: form.email.trim(),
-        password: form.password,
-      });
-
-      if (user) {
-        router.replace('/new-account');
-      }
-    } catch (error) {
-      if (error.message.includes('User already registered')) {
-        await handleSignIn();
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container} className='bg-zinc-900'>
       <KeyboardAvoidingView
@@ -171,39 +147,19 @@ const SignIn = () => {
             </TouchableOpacity>
 
           </View>
-          <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, { backgroundColor: `hsl(${passwordStrength}, 100%, 50%)` }, { width: `${passwordStrength}%` }]} />
-          </View>
-          {passwordRules.map((rule) => (
-            passwordErrors.includes(rule.label) && <Text
-              key={rule.label}
-              style={[
-                styles.rule,
-                !passwordErrors.includes(rule.label) ? styles.validRule : styles.invalidRule,
-              ]}
-            >
-              {rule.label}
-            </Text>
-          ))}
+
 
           <TouchableOpacity>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
-          
-        </View>
-       
 
-        <TouchableOpacity>
-          <Text style={styles.forgotPassword}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignIn} isLoading={isSubmitting} />
-        <Link href="/sign-up" style={styles.footer}>
-          <Text style={styles.footerText}>
-            Don't have an account?{' '}
-            <Text style={styles.signUpText}>Sign Up</Text>
-          </Text>
-        </Link>
+          <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignIn} isLoading={isSubmitting} />
+          <Link href="/sign-up" style={styles.footer}>
+            <Text style={styles.footerText}>
+              Don't have an account?{' '}
+              <Text style={styles.signUpText}>Sign Up</Text>
+            </Text>
+          </Link>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
