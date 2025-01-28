@@ -130,9 +130,11 @@ const PlaceDetails: React.FC = () => {
     } catch (error) {
       console.error('Error fetching interactions:', error);
     } finally {
-      setOverall(interactions[0]?.overall || 'empty');
-      setExpense(interactions[0]?.expense || 'empty');
-      setComfort(interactions[0]?.comfort || 'empty');
+      if (overall === 'empty') setOverall(interactions[0]?.overall || overall);
+      if (expense === 'empty') setExpense(interactions[0]?.expense || expense);
+      if (comfort === 'empty') setComfort(interactions[0]?.comfort || comfort);
+      // setExpense(interactions[0]?.expense || expense);
+      // setComfort(interactions[0]?.comfort || comfort);
 
     }
   };
@@ -144,7 +146,7 @@ const PlaceDetails: React.FC = () => {
 
     checkBookmarkStatus();
     fetchInteractions();
-    fetchUserInteractions();
+    // fetchUserInteractions();
   }, [user, id]);
 
   const handleBookmark = async () => {

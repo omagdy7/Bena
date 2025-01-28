@@ -256,10 +256,10 @@ const TripTimeline: React.FC = () => {
         entering={FadeInDown.duration(500).springify()}
         className="flex-col items-center p-4 mb-4 mx-4 bg-zinc-800 rounded-lg" >
         <View className="flex-row items-center rounded-lg  justify-between">
-          <View className=" flex-1 bg-zinc-700 p-2">
-            <Text className="text-white text-sm italic font-light">`http://54.84.91.107/share/trip/${trip.trip_id}`</Text>
-          </View>
-          <TouchableOpacity onPress={handleShareTrip} className="">
+          {/* <View className=" flex-1 bg-zinc-700 p-2"> */}
+            {/* <Text className="text-white text-sm italic font-light">`http://54.84.91.107/share/trip/${trip.trip_id}`</Text> */}
+            {/* </View> */}
+            <TouchableOpacity onPress={handleShareTrip} className="">
             <Ionicons className='px-8' name="share-outline" size={20} color="white" />
           </TouchableOpacity>
         </View>
