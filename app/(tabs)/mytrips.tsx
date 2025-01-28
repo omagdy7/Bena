@@ -216,7 +216,7 @@ const TripCard = ({ trip, index, setSyncing, setSyncedDate }) => {
           <TouchableOpacity
             style={{ width: 115 }}
             onPress={handleDeleteTrip}
-            className={`p-2 mt-2 rounded-xl  flex-row items-center justify-center bg-red-400`}> `
+            className={`p-2 mt-2 rounded-xl  flex-row items-center justify-center bg-red-400`}>
             <Ionicons
               name='trash-outline'
               size={18}
@@ -279,36 +279,35 @@ const AllTrips = () => {
       <StatusBar style="light" />
       <View className="flex-1 px-4 pt-6">
         <View className="flex-row items-center mb-4 justify-between">
-          <View className="flex-row items-center">
-            <View className="flex-row items-center px-4">
-              <Animated.Text
-                entering={FadeInDown.duration(500).springify()}
-                className="text-3xl font-bold text-white "
-              >
-                <Text className="text-3xl font-bold text-white text-white">My Trips</Text>
-              </Animated.Text>
-            </View>
-            <View className="flex-row items-center ">
-              <Animated.Text
-                entering={FadeInDown.duration(500).springify()}
-                className="text-3xl font-bold text-white "
-              >
-                {isSyncing && <Ionicons name="refresh" size={10} color="gray" className='pr-2' />}
-                <Text className="text-sm italic text-gray-500">{isSyncing ? ' syncing...'
-                  : (syncedDate && syncedDate < new Date(Date.now() - 86400000)) ? 'last synced at ' +
-                    syncedDate?.toLocaleString([], {
+
+
+          <View className="flex-row items-center ">
+            <Animated.Text
+              entering={FadeInDown.duration(500).springify()}
+              className="text-3xl font-bold text-white "
+            >
+              {isSyncing && <Ionicons name="refresh" size={10} color="gray" className='pr-2' />}
+              <Text className="text-sm italic text-gray-500">
+                {isSyncing
+                  ? 'syncing...'
+                  : (syncedDate && syncedDate < new Date(Date.now() - 86400000))
+                    ? `last synced at ${syncedDate?.toLocaleString([], {
                       year: 'numeric',
                       month: '2-digit',
                       day: '2-digit',
                       hour: '2-digit',
                       minute: '2-digit',
                       hour12: true
-                    }) : 'last synced at ' +
-                  syncedDate?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hourCycle: 'h12' })} </Text>
-              </Animated.Text>
-            </View>
+                    })}`
+                    : `last synced at ${syncedDate?.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hourCycle: 'h12'
+                    })}`
+                }
+              </Text>
+            </Animated.Text>
           </View>
-
           <View className="flex-row items-center px-4">
             <Animated.Text
               entering={FadeInDown.duration(500).springify()}
