@@ -12,17 +12,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 const { width } = Dimensions.get('window');
 
 export default function App() {
-  const { user, loading, completedSignUp } = useAuth();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    console.log('Completed sign up index:', completedSignUp);
     if (!loading && user) {
       setTimeout(() => {
         router.replace("/home");
       }, 0.250)
     }
-    
-  }, [user, loading, completedSignUp]);
+
+  }, [user, loading]);
 
   // Show a loader or splash screen while checking for the session
   if (loading) {
