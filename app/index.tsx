@@ -21,7 +21,7 @@ export default function App() {
       }, 0.250)
     }
 
-  }, [user, loading, completedSignUp]);
+  }, [user, loading]);
 
   // Show a loader or splash screen while checking for the session
   if (loading) {

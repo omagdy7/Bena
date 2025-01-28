@@ -152,10 +152,10 @@ const SignIn = () => {
           <TouchableOpacity>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
-          
+
         </View>
         <View style={styles.progressContainer}>
-          <View style={[styles.progressBar,{ backgroundColor: `hsl(${passwordStrength}, 100%, 50%)`}, { width: `${passwordStrength}%` }]} />
+          <View style={[styles.progressBar, { backgroundColor: `hsl(${passwordStrength}, 100%, 50%)` }, { width: `${passwordStrength}%` }]} />
         </View>
         {passwordRules.map((rule) => (
           passwordErrors.includes(rule.label) && <Text
@@ -180,7 +180,6 @@ const SignIn = () => {
             <Text style={styles.signUpText}>Sign Up</Text>
           </Text>
         </Link>
-        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
