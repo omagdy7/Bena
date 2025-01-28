@@ -12,6 +12,7 @@ import { usePlaces } from '@/hooks/usePlaces';
 import { useUserBookmarks } from '@/hooks/useUserBookmarks';
 import { useRecommendations } from '@/hooks/useRecommendations';
 import { router } from 'expo-router';
+import { FlashList } from '@shopify/flash-list';
 
 interface Place {
   places_id: string;
@@ -128,9 +129,9 @@ const ChoosePlacesScreen: React.FC = () => {
   }, []);
 
   const renderPlaces = useCallback((places: Place[]) => (
-    <FlatList
-      data={places}
-      keyExtractor={(item) => item.places_id}
+    <FlashList
+      data={places.filter(place => place?.places_id)}
+      keyExtractor={(item) => item?.places_id?.toString() || ''}
       renderItem={({ item }) => (
         <PlaceCard
           key={item.places_id}
@@ -140,7 +141,7 @@ const ChoosePlacesScreen: React.FC = () => {
         />
       )}
       showsVerticalScrollIndicator={false}
-    // estimatedItemSize={312}
+      estimatedItemSize={312}
     />
   ), [handleSelectPlace, selectedPlaces]);
 
