@@ -25,6 +25,8 @@ interface TripStepCardProps {
   onEdit: () => void;
   isLast: boolean;
   totalSteps: number;
+  isSelected: boolean;
+  onStepSelect: (stepId: string) => void;
 }
 
 const TripStepCard: React.FC<TripStepCardProps> = ({
@@ -39,6 +41,7 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
 
   const { markAsVisited, markAsPending, deleteStep} = useAllTrips();
   const [ isSelectedToSwap, setIsSelectedToSwap ] = useState(false);
+  const [ stepStatus, setStepStatus ] = useState(step.status);
 
   const handleOnMapPress = () => {
     Linking.openURL(step.place.external_link!);
@@ -46,10 +49,12 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
   }
 
   const handleMarkAsDone = async () => {
+    setStepStatus('visited');
     markAsVisited(step.step_id);
   }
 
   const handleMarkAsPending = async () => {
+    setStepStatus('pending');
     markAsPending(step.step_id);
   }
 
@@ -71,11 +76,11 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
       <View className="mr-4 h-full">
         <TimelineNode
           style={{
-            backgroundColor: step.status === 'visited' ? 'green' : step.status === 'in_progress' ? 'orange' : 'gray',
-            color: step.status === 'visited' || step.status === 'in_progress' ? 'white' : 'black',
+            backgroundColor: stepStatus === 'visited' ? 'green' : stepStatus === 'in_progress' ? 'orange' : 'gray',
+            color: stepStatus === 'visited' || stepStatus === 'in_progress' ? 'white' : 'black',
           }}
-          isCompleted={step.status === 'visited'}
-          isActive={step.status === 'in_progress'}
+          isCompleted={stepStatus === 'visited'}
+          isActive={stepStatus === 'in_progress'}
           isLast={isLast}
         />
       </View>
@@ -135,8 +140,8 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
                 <Ionicons name="swap-vertical-outline" size={16} color={isSelected ? '#18181b' : '#fcbf49'} />
                 <Text className={`text-white text-sm px-1 text-[${isSelected ? '#18181b' : '#fcbf49'}]`}>Swap Order</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={step.status === 'visited' ? handleMarkAsPending : handleMarkAsDone} className="flex-row items-center bg-zinc-800 px-3 py-2 rounded-full">
-                <Ionicons name={step.status === 'visited' ? "return-up-back-outline" : "checkmark-done-circle-outline"} size={16} color="#fcbf49" />
+              <TouchableOpacity onPress={stepStatus === 'visited' ? handleMarkAsPending : handleMarkAsDone} className="flex-row items-center bg-zinc-800 px-3 py-2 rounded-full">
+                <Ionicons name={stepStatus === 'visited' ? "return-up-back-outline" : "checkmark-done-circle-outline"} size={16} color="#fcbf49" />
               </TouchableOpacity>
             </View>
           </View>

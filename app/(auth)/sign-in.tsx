@@ -152,14 +152,34 @@ const SignIn = () => {
           <TouchableOpacity>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
+          
+        </View>
+        <View style={styles.progressContainer}>
+          <View style={[styles.progressBar,{ backgroundColor: `hsl(${passwordStrength}, 100%, 50%)`}, { width: `${passwordStrength}%` }]} />
+        </View>
+        {passwordRules.map((rule) => (
+          passwordErrors.includes(rule.label) && <Text
+            key={rule.label}
+            style={[
+              styles.rule,
+              !passwordErrors.includes(rule.label) ? styles.validRule : styles.invalidRule,
+            ]}
+          >
+            {rule.label}
+          </Text>
+        ))}
 
-          <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignIn} isLoading={isSubmitting} />
-          <Link href="/sign-up" style={styles.footer}>
-            <Text style={styles.footerText}>
-              Don't have an account?{' '}
-              <Text style={styles.signUpText}>Sign Up</Text>
-            </Text>
-          </Link>
+        <TouchableOpacity>
+          <Text style={styles.forgotPassword}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        <CustomButton icon="log-in-outline" title="Start Exploring The World" handlePress={handleSignIn} isLoading={isSubmitting} />
+        <Link href="/sign-up" style={styles.footer}>
+          <Text style={styles.footerText}>
+            Don't have an account?{' '}
+            <Text style={styles.signUpText}>Sign Up</Text>
+          </Text>
+        </Link>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
