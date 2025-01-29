@@ -17,7 +17,7 @@ export default function NearbyCarousal({ mainPlaceId }: NearbyCarousalProps) {
 
   useEffect(() => {
     const fetchNearbyPlaces = async () => {
-      const nearbyPlaces = await getNearbyPlaces(mainPlaceId, SEARCH_RADIUS);
+      const nearbyPlaces = await getNearbyPlaces(mainPlaceId);
       setNearbyPlaces(nearbyPlaces.near_places);
     };
 

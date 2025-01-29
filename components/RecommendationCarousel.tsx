@@ -8,6 +8,7 @@ import { FadeInRight } from 'react-native-reanimated';
 export default function RecommendationCarousel() {
   const router = useRouter();
   const { recommendations, loading, error } = useRecommendations();
+  // console.log(recommendations);
 
   const handlePlacePress = (placeId: string) => {
     router.push(`/home/${placeId}`);

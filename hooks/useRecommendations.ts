@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
-import { Place } from '@/db/schema';
-import { useAuthCheck } from '@/hooks/useAuthCheck';
+import { useQuery } from "@tanstack/react-query";
+import { Place } from "@/db/schema";
+import { useAuthCheck } from "@/hooks/useAuthCheck";
+import { supabase } from "@/lib/supabase";
 
 interface RecommendationResponse {
   recommendations: Place[];
@@ -8,10 +9,6 @@ interface RecommendationResponse {
 
 export const useRecommendations = () => {
   const user = useAuthCheck();
-  const RECOMMENDATION_ENDPOINT = process.env.EXPO_PUBLIC_RECOMMENDATION_MODEL_ENDPOINT;
-  const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL;
-  const RECOMMENDATION_ROUTE = process.env.EXPO_PUBLIC_RECOMMENDATION_ROUTE;
-
 
   const {
     data,
@@ -20,21 +17,31 @@ export const useRecommendations = () => {
     error,
     refetch,
   } = useQuery<RecommendationResponse, Error>({
-    queryKey: ['recommendations', user?.id],
+    queryKey: ["recommendations", user?.id],
     queryFn: async () => {
       if (!user?.id) {
-        throw new Error('User not authenticated');
+        throw new Error("User not authenticated");
       }
-      const response = await fetch(`${RECOMMENDATION_ENDPOINT}/${user.id}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch recommendations');
+
+      // Call the Supabase Edge Function
+      const { data: response, error: recommendationsError } = await supabase.functions.invoke(
+        "fetchRecommendations",
+        {
+          body: { id: user.id },
+        }
+      );
+
+      if (recommendationsError) {
+        throw new Error(recommendationsError.message || "Failed to fetch recommendations");
       }
-      return response.json();
+
+      // console.log("Recommendations", response);
+      return response;
     },
   });
 
   return {
-    recommendations: data?.recommendations ?? [],
+    recommendations: data?.recommendations.recommendations ?? [],
     loading,
     error: isError ? error.message : null,
     refetch,

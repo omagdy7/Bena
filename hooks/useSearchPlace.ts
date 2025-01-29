@@ -1,46 +1,69 @@
-import { useQuery } from '@tanstack/react-query';
-import { Place } from '@/db/schema';
+import { useQuery } from "@tanstack/react-query";
+import { Place } from "@/db/schema";
+import { supabase } from "@/lib/supabase";
 
 interface SearchPlaceResponse {
   places: Place[];
 }
 
 export const useSearchPlace = () => {
-  const SERVER_URL = process.env.EXPO_PUBLIC_SERVER_URL;
-  const SEARCH_PLACE_ROUTE = process.env.EXPO_PUBLIC_SEARCH_PLACE_ROUTE;
-  const NEARBY_PLACE_ROUTE = process.env.EXPO_PUBLIC_PLACES_NEARBY_ROUTE;
-
+  // Function to search places using Supabase Edge Function
   const getSearchedPlaces = async (searchText: string) => {
     if (!searchText) {
       return [];
     }
-    const API_URL = `${SERVER_URL}/${SEARCH_PLACE_ROUTE}/${searchText}`;
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-      throw new Error('Failed to fetch places');
+
+    const { data: response, error } = await supabase.functions.invoke("searchPlaces", {
+      body: { query: searchText },
+    });
+
+    if (error) {
+      throw new Error(error.message || "Failed to fetch places");
     }
-    return response.json();
+
+    return response.result;
   };
 
-  const getNearbyPlaces = async (placeID: string, radius = 1) => {
-    const API_URL = `${SERVER_URL}/${NEARBY_PLACE_ROUTE}/${placeID}?radius=${radius}`;
-    const response = await fetch(API_URL);
-    if (!response.ok) {
-      throw new Error('Failed to fetch places');
+  // Function to get nearby places using Supabase Edge Function
+  const getNearbyPlaces = async (placeID: string) => {
+    if (!placeID) {
+      return [];
     }
-    return response.json();
+
+    const { data: response, error } = await supabase.functions.invoke("fetchNearby", {
+      body: { id: placeID },
+    });
+
+    if (error) {
+      throw new Error(error.message || "Failed to fetch nearby places");
+    }
+
+    return response.nearby;
   };
 
+  // Default query for fetching places (modify if needed)
   const { data, isLoading, isError, error, refetch } = useQuery<SearchPlaceResponse, Error>({
-    queryKey: ['searchedPlaces'],
+    queryKey: ["searchedPlaces"],
     queryFn: async () => {
-      const response = await fetch(`${SERVER_URL}/${SEARCH_PLACE_ROUTE}/p`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch places');
+      const { data: response, error } = await supabase.functions.invoke("searchPlaces", {
+        body: { query: "pyramids" }, // Default query
+      });
+
+      if (error) {
+        throw new Error(error.message || "Failed to fetch places");
       }
-      return response.json();
+
+      return response.result;
     },
   });
 
-  return { getPlaces: getSearchedPlaces, getNearbyPlaces: getNearbyPlaces, places: data?.places ?? [], loading: isLoading, isError, error, refetch };
+  return {
+    getPlaces: getSearchedPlaces,
+    getNearbyPlaces: getNearbyPlaces,
+    places: data?.places ?? [],
+    loading: isLoading,
+    isError,
+    error,
+    refetch,
+  };
 };
