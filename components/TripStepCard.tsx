@@ -9,11 +9,6 @@ import { router } from 'expo-router';
 import useAllTrips from '@/hooks/useAllTrips';
 import { useState } from 'react';
 
-
-
-
-
-
 interface TripStepCardProps {
   step: TripStep & { place: Place };
   index: number;
@@ -129,7 +124,7 @@ const TripStepCard: React.FC<TripStepCardProps> = ({
               <View className="flex-row gap-flex-row justify-between items-center">
                 <TouchableOpacity onPress={handleOnMapPress} className="flex-row items-center bg-zinc-800 px-3 py-2 rounded-full">
                   <Ionicons name="map-outline" size={16} color="#fcbf49" />
-                  <Text className="text-white text-sm px-1 text-[#fcbf49]">Open On Maps</Text>
+                  <Text className="white text-sm px-1 text-[#fcbf49]">Open On Maps</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleSelectedToSwap} className={`flex-row items-center px-3 py-2 rounded-full ${isSelected ? 'bg-[#fcbf49]' : 'bg-zinc-800'}`}>
                   <Ionicons name="swap-vertical-outline" size={16} color={isSelected ? '#18181b' : '#fcbf49'} />

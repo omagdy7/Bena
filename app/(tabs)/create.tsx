@@ -11,6 +11,7 @@ import { BlurView } from 'expo-blur';
 import { TripStep, Place } from '@/db/schema';
 import { supabase } from '@/lib/supabase';
 import { useAuthCheck } from '@/hooks/useAuthCheck';
+import AIPromptModal from '@/components/AIPromptModal';
 
 
 const CreateTrip: React.FC = () => {
@@ -30,6 +31,11 @@ const CreateTrip: React.FC = () => {
   const [loading, setLoading] = useState(false);  // New state to track loading status
   const [isEmptyFields, setIsEmptyFields] = useState(false);  // New state to track loading status
   const [selectedPlaces, setSelectedPlaces] = useState([]); // State to track selected places for swapping
+
+  const [showAIPromptModal, setShowAIPromptModal] = useState(false);
+  const [aiPrompt, setAIPrompt] = useState('');
+  const [aiLoading, setAILoading] = useState(false);
+  const [aiError, setAIError] = useState<string | null>(null);
 
 
 
@@ -189,9 +195,89 @@ const CreateTrip: React.FC = () => {
 
 
 
-  const handleGenerateAITrip = () => {
-    // TODO: Implement AI trip generation logic here
-    console.log('Generating AI trip');
+  const handleGenerateAITrip = async () => {
+    if (!aiPrompt.trim()) {
+      setAIError('Please describe your trip idea');
+      return;
+    }
+
+    setAILoading(true);
+    setAIError(null);
+
+    try {
+      // 1. Get AI-generated trip plan with places_ids
+      const { data: aiData, error: aiError } = await supabase.functions.invoke('generate_ai_trip', {
+        body: {
+          messages: [{
+            role: "user",
+            content: aiPrompt
+          }]
+        }
+      });
+
+      if (aiError) throw aiError;
+      if (!aiData?.trip_title || !aiData?.places) {
+        throw new Error('Invalid response from AI');
+      }
+
+      // 2. Extract places_ids from AI response (limit to 3)
+      const placeIds = aiData.places.slice(0, 3).map(p => p.places_id);
+
+      // 3. Fetch complete place details from database
+      const { data: dbPlaces, error: dbError } = await supabase
+        .from('places')
+        .select('*')
+        .in('places_id', placeIds);
+
+      if (dbError) throw dbError;
+      if (!dbPlaces?.length) {
+        throw new Error('No places found in database');
+      }
+
+      // 4. Calculate sequential time slots
+      const timeSlots = [];
+      let currentStart = steps.length > 0
+        ? new Date(steps[steps.length - 1].end_time) // Start after last existing step
+        : new Date(); // Or current time if no existing steps
+
+      for (const place of dbPlaces) {
+        const startTime = new Date(currentStart);
+        const endTime = new Date(startTime.getTime() + 2 * 60 * 60 * 1000); // Add 2 hours
+
+        timeSlots.push({ startTime, endTime });
+        currentStart = endTime; // Set next start to current end
+      }
+
+      // 5. Create steps with sequential times
+      const newSteps = dbPlaces.map((place: Place, index: number) => ({
+        step_num: steps.length + index + 1,
+        place_id: place.places_id,
+        place: {
+          ...place,
+          image: place.image,
+          name: place.name,
+          city: place.city,
+          description: place.description,
+          latitude: place.latitude,
+          longitude: place.longitude
+        },
+        start_time: timeSlots[index].startTime,
+        end_time: timeSlots[index].endTime,
+        status: 'pending' as const
+      }));
+
+      // 6. Update state
+      setTitle(aiData.trip_title);
+      setSteps([...steps, ...newSteps]);
+      setShowAIPromptModal(false);
+      setAIPrompt('');
+
+    } catch (error) {
+      console.error('AI Trip Generation Error:', error);
+      setAIError(error.message || 'Failed to generate trip. Please try again.');
+    } finally {
+      setAILoading(false);
+    }
   };
 
   return (
@@ -205,8 +291,9 @@ const CreateTrip: React.FC = () => {
           <Text className="text-2xl font-bold text-white flex-shrink" style={{ color: "white" }}>
             Create Your Trip
           </Text>
+
           <TouchableOpacity
-            onPress={handleGenerateAITrip}
+            onPress={() => setShowAIPromptModal(true)}
             className="flex-row items-center bg-gray-700 px-3 py-2 rounded-md"
           >
             <Ionicons name="bulb-outline" size={16} color="white" className="mr-2" />
@@ -377,6 +464,16 @@ const CreateTrip: React.FC = () => {
           onChange={handleDateChange}
         />
       )}
+      {/* AI Prompt Modal */}
+      <AIPromptModal
+        visible={showAIPromptModal}
+        onClose={() => setShowAIPromptModal(false)}
+        onGenerate={handleGenerateAITrip}
+        aiPrompt={aiPrompt}
+        setAIPrompt={setAIPrompt}
+        aiLoading={aiLoading}
+        aiError={aiError}
+      />
     </SafeAreaView>
   );
 };
