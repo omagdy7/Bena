@@ -77,7 +77,7 @@ export default function App() {
         >
           <CustomButton
             title="Get Started"
-            handlePress={() => router.push('/sign-in')}
+            handlePress={() => router.push('/onboarding')}
             icon="arrow-forward-outline"
           />
         </Animated.View>
