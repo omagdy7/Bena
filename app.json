@@ -10,12 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.Bena",
-      "infoPlist": {
-        "NSAppTransportSecurity": {
-          "NSAllowsArbitraryLoads": true
-        }
-      }
+      "bundleIdentifier": "com.anonymous.Bena"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,8 +20,7 @@
       "package": "com.anonymous.Bena",
       "permissions": [
         "android.permission.RECORD_AUDIO"
-      ],
-      "usesCleartextTraffic": true
+      ]
     },
     "web": {
       "bundler": "metro",
