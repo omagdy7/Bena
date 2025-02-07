@@ -27,31 +27,47 @@ BENA is a groundbreaking mobile travel planning application designed to transfor
 
 ### Sign-In Screen
 
-<img src="./assets/screens/signin.png" width="45%" style="margin-right: 10px;">
-<img src="./assets/screens/signin_gaurd.png" width="45%">
+<table>
+  <tr>
+    <td><img src="./assets/screens/signin.png" width="90%"></td>
+    <td><img src="./assets/screens/signin_gaurd.png" width="90%"></td>
+  </tr>
+</table>
 
 ### Explore Screen
 
-<img src="./assets/screens/loading_page.png" width="30%" style="margin-right: 10px;">
-<img src="./assets/screens/explore_1.png" width="30%" style="margin-right: 10px;">
-<img src="./assets/screens/explore_2.png" width="30%">
+<table>
+  <tr>
+    <td><img src="./assets/screens/loading_page.png" width="90%"></td>
+    <td><img src="./assets/screens/explore_1.png" width="90%"></td>
+    <td><img src="./assets/screens/explore_2.png" width="90%"></td>
+  </tr>
+</table>
 
 *   **Personalized Recommendations:** The Explore screen is where users discover personalized recommendations based on their interests and past behavior.
 *   **Curated Categories:** The Explore tab is split into different categories to help users discover destinations based on their current mood or plans.
 
 ### Trip Creation Screen
 
-<img src="./assets/screens/create_trip_manual.png" width="30%" style="margin-right: 10px;">
-<img src="./assets/screens/choose_place.png" width="30%" style="margin-right: 10px;">
-<img src="./assets/screens/create_trip_ai.png" width="30%">
+<table>
+  <tr>
+    <td><img src="./assets/screens/create_trip_manual.png" width="90%"></td>
+    <td><img src="./assets/screens/choose_place.png" width="90%"></td>
+    <td><img src="./assets/screens/create_trip_ai.png" width="90%"></td>
+  </tr>
+</table>
 
 *   **Al Generation**: Automatically generate a trip by using Natural Language, this will connect to our models that will generate a trip tailored for the user's current desires
 *   **Trip planning with detailed list of steps**: The page is built to guide users step by step, ensuring that even first-time travelers can create comprehensive itineraries
 
 ### Current Trip Screen
 
-<img src="./assets/screens/current_trip_2.png" width="45%" style="margin-right: 10px;">
-<img src="./assets/screens/share_trip.png" width="45%">
+<table>
+  <tr>
+    <td><img src="./assets/screens/current_trip_2.png" width="90%"></td>
+    <td><img src="./assets/screens/share_trip.png" width="90%"></td>
+  </tr>
+</table>
 
 *   **Track progress on your travels**: Track down the steps to get a live look at your current travels
 *   **Live feedback and easy navigation**: Get simple steps to visit your favorite places using the simple navigation bar or edit it to your desires in real time
