@@ -1,7 +1,9 @@
 # BENA: Revolutionizing Travel in Egypt with AI-Powered Itineraries
 
 ![BENA Logo Placeholder](./assets/images/logo.png)
+
 ## Table of Contents
+
 *   [About](#about)
 *   [Key Screens and Features](#key-screens-and-features)
     *   [Sign-In Screen](#signin-screen)
@@ -19,48 +21,52 @@
 
 ## About
 
-BENA is a groundbreaking mobile travel planning application designed to transform how people explore Egypt's rich cultural and historical landscape.  More than just a trip planner, BENA is a personalized travel companion that leverages artificial intelligence, geolocation services, and data-driven insights to deliver seamless, engaging, and memorable experiences.  Targeting both seasoned explorers and first-time visitors, BENA simplifies trip organization, enhances discovery, and fosters shared travel experiences within a vibrant community. By integrating ancient Egyptian-inspired branding with modern technology, BENA aims to set a new standard for travel apps in the region and beyond.
+BENA is a groundbreaking mobile travel planning application designed to transform how people explore Egypt's rich cultural and historical landscape. More than just a trip planner, BENA is a personalized travel companion that leverages artificial intelligence, geolocation services, and data-driven insights to deliver seamless, engaging, and memorable experiences. Targeting both seasoned explorers and first-time visitors, BENA simplifies trip organization, enhances discovery, and fosters shared travel experiences within a vibrant community. By integrating ancient Egyptian-inspired branding with modern technology, BENA aims to set a new standard for travel apps in the region and beyond.
 
 ## Key Screens and Features
 
 ### Sign-In Screen
 
-![Sign-In Screen](./assets/screens/signin.png)
-![Sign-In with guard](./assets/screens/signin_gaurd.png)
+<img src="./assets/screens/signin.png" width="45%" style="margin-right: 10px;">
+<img src="./assets/screens/signin_gaurd.png" width="45%">
 
 ### Explore Screen
 
-![Explore Loading Screen](./assets/screens/loading_page.png)
-![Explore Screen Recommendations Carousel](./assets/screens/explore_1.png)
-![Explore Screen Categories Carousel](./assets/screens/explore_2.png)
+<img src="./assets/screens/loading_page.png" width="30%" style="margin-right: 10px;">
+<img src="./assets/screens/explore_1.png" width="30%" style="margin-right: 10px;">
+<img src="./assets/screens/explore_2.png" width="30%">
 
 *   **Personalized Recommendations:** The Explore screen is where users discover personalized recommendations based on their interests and past behavior.
 *   **Curated Categories:** The Explore tab is split into different categories to help users discover destinations based on their current mood or plans.
 
 ### Trip Creation Screen
 
-![Trip Creation Manual](./assets/screens/create_trip_manual.png)
-![Choosing places as steps](./assets/screens/choose_place.png)
-![Trip Creation using ai](./assets/screens/create_trip_ai.png)
+<img src="./assets/screens/create_trip_manual.png" width="30%" style="margin-right: 10px;">
+<img src="./assets/screens/choose_place.png" width="30%" style="margin-right: 10px;">
+<img src="./assets/screens/create_trip_ai.png" width="30%">
 
 *   **Al Generation**: Automatically generate a trip by using Natural Language, this will connect to our models that will generate a trip tailored for the user's current desires
 *   **Trip planning with detailed list of steps**: The page is built to guide users step by step, ensuring that even first-time travelers can create comprehensive itineraries
+
 ### Current Trip Screen
 
-![Current Trip Screen Screenshot](./assets/screens/current_trip_2.png)
-![Share Trip Screen](./assets/screens/share_trip.png)
+<img src="./assets/screens/current_trip_2.png" width="45%" style="margin-right: 10px;">
+<img src="./assets/screens/share_trip.png" width="45%">
+
 *   **Track progress on your travels**: Track down the steps to get a live look at your current travels
 *   **Live feedback and easy navigation**: Get simple steps to visit your favorite places using the simple navigation bar or edit it to your desires in real time
 
 ### Search screen
 
 ![Search Screen](./assets/screens/search.png)
+
 *   **Easy and smart to search**: The main idea of the search screen is to provide easy access to the most basic needs
 *   **Search by keywords, categories, and/or filters.**
+
 ## Technologies Used
 
 *   **Mobile App:** React Native (with Expo)
-*   **Backend:** Python (Flask - *update this if you are using something else*), deployed on AWS EC2
+*   **Backend:** Python (Flask), deployed on AWS EC2
 *   **Database:** PostgreSQL (hosted on Supabase) with JSONB support for flexible data storage
 *   **Machine Learning:** Scikit-learn (TF-IDF, cosine similarity), NumPy, Pandas
 *   **Mapping:** Google Maps API
@@ -101,15 +107,19 @@ The project uses a hybrid recommendation model combining:
 *   **Content-Based Filtering:** Uses TF-IDF (Term Frequency-Inverse Document Frequency) and cosine similarity to recommend places with characteristics similar to those the user has bookmarked or interacted with.
 *   **Proximity-Based Recommendations:** Utilizes the Haversine formula to calculate distances and recommend nearby destinations to bookmarked ones.
 *   **Hybrid approach**: A hybrid system balances relevance based on tags and geographic closeness to create a comprehensive recommendation experience.
+
 **4.1.5 Data filtering imperfections**
-* Code also accounts for data imperfections, by lowing the scores of places without data, or not having an image
+
+*   Code also accounts for data imperfections, by lowing the scores of places without data, or not having an image
 
 **Why these machine learning techniques were chosen**
-* They provide accurate and efficient solutions to a travel app like this.
+
+*   They provide accurate and efficient solutions to a travel app like this.
 
 ## Technical Architecture
 
 *   **Database Design**: Schema overview
+
     ![Database Schema](./assets/screens/schema.png)
 *   **Modularity:** The server-app communication is separated with well defined API models and functionalities for discovery, recommendation, and user personalization
 *   **Ease of Scale**: The AWS EC2 is a service that provides an automatic scaling backend with an easy to scale service from Supabase
